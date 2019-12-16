@@ -15,6 +15,7 @@
 #include "Model.hpp"
 #include "WorldObject.hpp"
 
+void setSamples();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -23,6 +24,9 @@ unsigned int loadTexture(const char *path);
 void renderScene(const Shader * shader, bool lightning);
 
 void renderQuad();
+
+GLuint framebuffer;
+GLuint samples = 1;
 
 // settings
 const unsigned int SCR_WIDTH = 1280;
@@ -45,6 +49,35 @@ float bumpiness = 1.0f;
 std::vector<WorldObject*> worldObjects;
 
 std::vector<WorldObject*> lights;
+
+
+void setSamples()
+{
+	std::cout << samples << std::endl;
+	// configure MSAA framebuffer
+	// --------------------------
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	// create a multisampled color attachment texture
+	unsigned int textureColorBufferMultiSampled;
+	glGenTextures(1, &textureColorBufferMultiSampled);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGB, SCR_WIDTH, SCR_HEIGHT, GL_TRUE);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled, 0);
+	// create a (also multisampled) renderbuffer object for depth and stencil attachments
+	unsigned int rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 
 int main()
 {
@@ -83,6 +116,7 @@ int main()
 	// configure global opengl state
 	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
 
 	float vertarray[] = {
 		// back face
@@ -224,7 +258,7 @@ int main()
 
 	// lighting info
 	// -------------
-	glm::vec3 lightPos(5.0f, 18.0f, 5.0f);
+	glm::vec3 lightPos(10.0f, 18.0f, 10.0f);
 
 	lights.push_back(new WorldObject());
 	lights[0]->setModel(cube);
@@ -293,6 +327,10 @@ int main()
 	debugDepthQuad->use();
 	debugDepthQuad->setInt("depthMap", 0);
 
+
+
+	setSamples();
+	
 	// render loop
 	// -----------
 	while (!glfwWindowShouldClose(window))
@@ -330,7 +368,7 @@ int main()
 		glCullFace(GL_FRONT);
 		renderScene(simpleDepthShader, true);
 		glCullFace(GL_BACK);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
 		// reset viewport
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
@@ -347,7 +385,7 @@ int main()
 		shader->setMat4("view", view);
 		// set light uniforms
 		shader->setVec3("viewPos", camera.location);
-		shader->setVec3("lightPos", lightPos);
+		shader->setVec3("lightDir", lightPos);
 		shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 		shader->setFloat("bumpiness", bumpiness);
 		
@@ -362,7 +400,12 @@ int main()
 		debugDepthQuad->setFloat("far_plane", far_plane);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
-		renderQuad();
+		//renderQuad();
+
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -499,6 +542,22 @@ void processInput(GLFWwindow *window)
 			bumpiness /= 1.1;
 		}
 	}
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+	{
+		if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
+		{
+			samples++;
+			setSamples();
+			while (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS) glfwPollEvents();
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
+		{
+			samples--;
+			setSamples();
+			while (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS) glfwPollEvents();
+		}
+	}
 	else
 	{
 		if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
@@ -524,16 +583,6 @@ void processInput(GLFWwindow *window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-//
-//	float cameraSpeed = 2.5 * deltaTime;
-//	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-//		camera.ProcessKeyboard(FORWARD, deltaTime);
-//	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-//		camera.ProcessKeyboard(BACKWARD, deltaTime);
-//	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-//		camera.ProcessKeyboard(LEFT, deltaTime);
-//	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-//		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

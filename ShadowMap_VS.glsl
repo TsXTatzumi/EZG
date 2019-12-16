@@ -34,6 +34,8 @@ void main()
     mat3 TBN = transpose(mat3(T * bumpiness, B * bumpiness, N));    
 
     vs_out.TBN = TBN;
-    
+
+	vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
+
 	gl_Position = projection * view * model * vec4(aPos, 1.0);
 }
