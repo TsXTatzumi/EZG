@@ -1,15 +1,7 @@
-﻿  Camera.cpp
-  main.cpp
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(340,22): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(542,20): warning C4305: "/=": Verkürzung von "double" in "float"
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(570,16): warning C4305: "/=": Verkürzung von "double" in "float"
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(604,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
-  Model.cpp
-  Shader.cpp
-  Transform.cpp
-  WorldObject.cpp
-  Code wird generiert...
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(605,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
-  glad.c
-LINK : warning LNK4098: Standardbibliothek "MSVCRT" steht in Konflikt mit anderen Bibliotheken; /NODEFAULTLIB:Bibliothek verwenden.
-  EZG.vcxproj -> E:\Dokumente\FH\Abgaben\repos\EZG\Debug\EZG.exe
+﻿  main.cpp
+C:\Users\simeo\source\repos\EZG\main.cpp(340,22): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
+C:\Users\simeo\source\repos\EZG\main.cpp(542,20): warning C4305: "/=": Verkürzung von "double" in "float"
+C:\Users\simeo\source\repos\EZG\main.cpp(570,16): warning C4305: "/=": Verkürzung von "double" in "float"
+C:\Users\simeo\source\repos\EZG\main.cpp(604,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+C:\Users\simeo\source\repos\EZG\main.cpp(605,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+  EZG.vcxproj -> C:\Users\simeo\source\repos\EZG\Debug\EZG.exe

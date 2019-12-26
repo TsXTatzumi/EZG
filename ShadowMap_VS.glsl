@@ -25,13 +25,13 @@ void main()
     vs_out.FragPos = vec3(model * vec4(aPos, 1.0));   
     vs_out.TexCoords = aTexCoords;
     
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
+    mat3 normalMatrix = inverse(mat3(model));
     vec3 T = normalize(normalMatrix * aTangent);
     vec3 N = normalize(normalMatrix * aNormal);
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
     
-    mat3 TBN = transpose(mat3(T * bumpiness, B * bumpiness, N));    
+    mat3 TBN = mat3(T * bumpiness, B * bumpiness, N);    
 
     vs_out.TBN = TBN;
 
