@@ -67,8 +67,12 @@ private:
 	int m_maxLevel = 0;
 
 	const uint8_t m_dimension = 3;
+	std::vector<glm::vec3> * m_TreeWires;
+
+	bool m_BufferInit = false;
 
 	GLuint VAO, VBO;
+	void initBuffer();
 
 	Node* buildTree(typename std::vector<Point>::iterator start, typename std::vector<Point>::iterator end, int currLevel);
 	Node* findNode(Node* currNode, const Point& pt) const;
