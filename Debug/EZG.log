@@ -1,4 +1,1 @@
-﻿  kdTree.cpp
-S:\Projects\C++\FH\EZG\kdTree.cpp(62,63): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-S:\Projects\C++\FH\EZG\kdTree.cpp(86,21): warning C4018: '<': signed/unsigned mismatch
-  EZG.vcxproj -> S:\Projects\C++\FH\EZG\Debug\EZG.exe
+﻿

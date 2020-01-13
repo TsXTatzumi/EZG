@@ -16,6 +16,7 @@
 #include "WorldObject.hpp"
 
 #include "kdTree.h"
+#include "Spline.hpp"
 
 void setSamples();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -40,6 +41,10 @@ float lastX = (float)SCR_WIDTH / 2.0;
 float lastY = (float)SCR_HEIGHT / 2.0;
 bool firstMouse = true;
 float speed = 3.0f;
+
+Spline path;
+
+bool b_edit;
 
 // timing
 float deltaTime = 0.0f;
@@ -261,6 +266,58 @@ int main()
 	worldObjects[4]->location = { 0, -7, -10 };
 	worldObjects[4]->scale = { 50, 1, 50 };
 
+	// spline
+	// -------------
+
+
+	path.AddLocation({ 0, 0, 0 });
+	path.AddLocation({ -13.019, 6.03497e-07, -6.33639 });
+	path.AddLocation({ -22.723, 8.5216e-07, -25.7333 });
+	path.AddLocation({ 3.69777, 16.7579, -39.0616 });
+	path.AddLocation({ 23.5036, 16.7579, -23.4847 });
+	path.AddLocation({ 2.57999, -4.35475, -14.3093 });
+	path.AddLocation({ -5.70131, -5.26008, -13.2413 });
+	path.AddLocation({ -9.05775, 7.77142, -10.1961 });
+	path.AddLocation({ -8.35377, 6.98028, -12.3498 });
+	path.AddLocation({ -5.85255, 3.81571, -25.1518 });
+	path.AddLocation({ -1.44609, 24.7389, -33.1356 });
+	path.AddLocation({ -0.678881, 50.5285, -22.3502 });
+	path.AddLocation({ -1.82137, 74.9814, -19.6965 });
+	path.AddLocation({ -1.90223, 23.0938, -9.54347 });
+	path.AddLocation({ -5.32363, 13.9461, -0.865797 });
+	path.AddLocation({ -0.37169, 1.30858, -15.3703 });
+	path.AddLocation({ -16.1956, -0.559416, -23.7236 });
+	path.AddLocation({ 6.10949, -0.559376, -30.7428 });
+	path.AddLocation({ 15.3143, -0.496965, -13.7454 });
+	path.AddLocation({ 20.9462, -20.6374, 0.00605643 });
+	path.AddLocation({ -0.765951, -16.5774, 2.11632 });
+	path.AddLocation({ 2.02551, -6.01751, 1.72638 });
+
+	path.AddRotation({ 0, -0, 0 }, 0);
+	path.AddRotation({ -0.0359997, -0.847976, 2.25263e-08 }, 3.80514);
+	path.AddRotation({ -3.12959, -1.2935, -3.14159 }, 8.46227);
+	path.AddRotation({ 2.46959, 0.366386, -3.14159 }, 14.2939);
+	path.AddRotation({ -0.492001, 1.10306, -2.21436e-06 }, 19.3136);
+	path.AddRotation({ 0.736001, -0.89668, -1.33684e-06 }, 24.8911);
+	path.AddRotation({ -2.72959, -0.592678, -3.14159 }, 27.7892);
+	path.AddRotation({ -1.216, -0.939718, -3.73782e-06 }, 31.5036);
+	path.AddRotation({ -0.336002, -0.31593, -2.41427e-06 }, 33.0528);
+	path.AddRotation({ 2.79359, -0.933281, -3.14159 }, 36.7164);
+	path.AddRotation({ 2.18159, -0.201542, -3.14159 }, 41.4939);
+	path.AddRotation({ -1.54013, 1.54298, -0.000128567 }, 46.782);
+	path.AddRotation({ -1.464, -0.836508, -3.91399e-06 }, 51.7442);
+	path.AddRotation({ 1.3176, 0.994755, -3.14159 }, 59.0155);
+	path.AddRotation({ -0.747998, -0.18476, -1.34917e-06 }, 62.63);
+	path.AddRotation({ -0.00799707, -0.668543, -1.9526e-06 }, 67.087);
+	path.AddRotation({ -3.03759, -1.0841, -3.14159 }, 71.3285);
+	path.AddRotation({ -3.10559, 0.515022, -3.14159 }, 76.1642);
+	path.AddRotation({ 0.0879967, 1.22534, -5.12653e-06 }, 80.5608);
+	path.AddRotation({ 0.72, 0.51589, -2.46681e-06 }, 85.5637);
+	path.AddRotation({ 0.744005, -0.687468, -3.79829e-06 }, 90.2742);
+	path.AddRotation({ 0.336003, -0.00785652, -1.13427e-06 }, 93.5802);
+
+	path.SetLooped(true);
+	
 	// lighting info
 	// -------------
 	glm::vec3 lightPos(10.0f, 18.0f, 10.0f);
@@ -357,6 +414,20 @@ int main()
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+
+		if (!b_edit)
+		{
+			float error = -1;
+			for (char i = 0; i < 10 && abs(error) > 0.01f; ++i)
+			{
+				path.move(-error * speed);
+				auto diff = path.GetSplinePointLocation() - camera.location;
+				error = sqrtf(powf(diff.x, 2) + powf(diff.y, 2) + powf(diff.z, 2)) / speed * 60 - 1;
+			}
+
+			camera.location = path.GetSplinePointLocation();
+			camera.rotation = path.GetSplinePointRotation();
+		}
 
 		// input
 		// -----
@@ -501,7 +572,13 @@ void renderQuad()
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
-	if (true)
+	if (glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS)
+	{
+		b_edit = !b_edit;
+		while (glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS) glfwPollEvents();
+	}
+	
+	if (b_edit)
 	{
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		{
@@ -524,12 +601,12 @@ void processInput(GLFWwindow *window)
 
 		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		{
-			camera.roll += 0.015f;
+			camera.roll -= 0.015f;
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 		{
-			camera.roll -= 0.015f;
+			camera.roll += 0.015f;
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
@@ -537,32 +614,35 @@ void processInput(GLFWwindow *window)
 			camera.roll = 0.0f;
 		}
 
-		//if (key == '*')
-		//{
-		//	path.next();
-		//}
+		if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS)
+		{
+			path.next();
+			while (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) glfwPollEvents();
+		}
 
-		//if (key == '_')
-		//{
-		//	path.prev();
-		//}
+		if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
+		{
+			path.prev();
+			while (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) glfwPollEvents();
+		}
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		//path.AddLocationWithRotation(camera.location, eulerAngles(camera.CorrectRotation()));
+		path.AddLocationWithRotation(camera.location, eulerAngles(camera.CorrectRotation()));
+		while (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) glfwPollEvents();
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
 		if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
 		{
-			bumpiness *= 1.1f;
+			bumpiness *= 1.05f;
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
 		{
-			bumpiness /= 1.1;
+			bumpiness /= 1.05;
 		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
@@ -585,24 +665,26 @@ void processInput(GLFWwindow *window)
 	{
 		if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
 		{
-			speed *= 1.1f;
+			speed *= 1.02f;
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
 		{
-			speed /= 1.1;
+			speed /= 1.02;
 		}		
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_DELETE) == GLFW_PRESS)
 	{
-		//path.removeLocation();
-		//path.removeRotation();
+		path.removeLocation();
+		path.removeRotation();
+		while (glfwGetKey(window, GLFW_KEY_DELETE) == GLFW_PRESS) glfwPollEvents();
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_KP_ENTER) == GLFW_PRESS)
 	{
-		//path.print();
+		path.print();
+		while (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) glfwPollEvents();
 	}
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);

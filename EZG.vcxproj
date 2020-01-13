@@ -133,6 +133,7 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Spline.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="WorldObject.cpp" />
@@ -144,6 +145,7 @@
     <ClInclude Include="Model.hpp" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Shader.hpp" />
+    <ClInclude Include="Spline.hpp" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="Transform.hpp" />
     <ClInclude Include="WorldObject.hpp" />
