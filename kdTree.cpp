@@ -113,11 +113,6 @@ KDTree::KDTree(std::vector<Point>& points) {
 }
 
 
-KDTree::KDTree(const KDTree& rhs) {
-	m_root = deepcopyTree(rhs.m_root);
-	m_size = rhs.m_size;
-}
-
 
 KDTree& KDTree::operator=(const KDTree& rhs) {
 	if (this != &rhs) { // make sure we don't self-assign
@@ -146,16 +141,29 @@ std::size_t KDTree::dimension() const {
 	return m_dimension;
 }
 
+KDTree::KDTree(const KDTree& rhs) {
+	
+
+	m_root = deepcopyTree(rhs.m_root);
+	m_size = rhs.m_size;
+}
+
+void KDTree::initBuffer() {
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	m_BufferInit = true;
+}
+
 void KDTree::drawWireframe(const Shader* shader, glm::mat4 model)
 {
-	/*std::cout << "Min:\n";
-	std::cout << "x: " << m_minBound.x << "\n";
-	std::cout << "y: " << m_minBound.y << "\n";
-	std::cout << "z: " << m_minBound.z << "\n";
-	std::cout << "Max:\n";
-	std::cout << "x: " << m_maxBound.x << "\n";
-	std::cout << "y: " << m_maxBound.y << "\n";
-	std::cout << "z: " << m_maxBound.z << "\n";*/
+
+	if (!m_BufferInit) {
+		initBuffer();
+	}
 
 	std::vector<glm::vec3> boundingBox;
 	boundingBox.push_back(m_minBound);
@@ -186,11 +194,7 @@ void KDTree::drawWireframe(const Shader* shader, glm::mat4 model)
 	boundingBox.push_back(glm::vec3(m_minBound.x, m_maxBound.y, m_minBound.z));
 	boundingBox.push_back(glm::vec3(m_maxBound.x, m_maxBound.y, m_minBound.z));
 
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	
 
 	glBufferData(GL_ARRAY_BUFFER, boundingBox.size() * sizeof(glm::vec3), &boundingBox[0], GL_STATIC_DRAW);
 
@@ -245,13 +249,15 @@ void KDTree::drawWireframeRecursive(const Shader* shader, glm::mat4 model, glm::
 		break;
 	}
 
+	
 	glLineWidth(m_maxLevel / (currLevel + 4.0f));
 
-	glBufferData(GL_ARRAY_BUFFER, plane.size() * sizeof(glm::vec3), &plane[0], GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, plane.size() * sizeof(glm::vec3), &plane[0]);
 
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_LINES, 0, plane.size());
 	glBindVertexArray(0);
+	
 
 	if (node->m_left != nullptr) {
 		glm::vec3 newMax = maxBound;
