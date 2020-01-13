@@ -1,7 +1,4 @@
-﻿  main.cpp
-C:\Users\simeo\source\repos\EZG\main.cpp(340,22): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
-C:\Users\simeo\source\repos\EZG\main.cpp(542,20): warning C4305: "/=": Verkürzung von "double" in "float"
-C:\Users\simeo\source\repos\EZG\main.cpp(570,16): warning C4305: "/=": Verkürzung von "double" in "float"
-C:\Users\simeo\source\repos\EZG\main.cpp(604,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
-C:\Users\simeo\source\repos\EZG\main.cpp(605,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
-  EZG.vcxproj -> C:\Users\simeo\source\repos\EZG\Debug\EZG.exe
+﻿  kdTree.cpp
+S:\Projects\C++\FH\EZG\kdTree.cpp(62,63): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+S:\Projects\C++\FH\EZG\kdTree.cpp(86,21): warning C4018: '<': signed/unsigned mismatch
+  EZG.vcxproj -> S:\Projects\C++\FH\EZG\Debug\EZG.exe

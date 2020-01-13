@@ -15,6 +15,8 @@
 #include "Model.hpp"
 #include "WorldObject.hpp"
 
+#include "kdTree.h"
+
 void setSamples();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -50,6 +52,9 @@ std::vector<WorldObject*> worldObjects;
 
 std::vector<WorldObject*> lights;
 
+//KDTree
+KDTree * kdTree;
+Shader* kdTreeShader;
 
 void setSamples()
 {
@@ -262,14 +267,15 @@ int main()
 
 	lights.push_back(new WorldObject());
 	lights[0]->setModel(cube);
-	lights[0]->location = lightPos;
-	lights[0]->scale = { 3, 3, 3 };
+	//lights[0]->location = lightPos;
+	//lights[0]->scale = { 3, 3, 3 };
 
 	// build and compile shaders
 	// -------------------------
 	Shader * simpleDepthShader = new Shader("Depth_VS.glsl", "Empty_FS.glsl");
 	Shader * shader = new Shader("ShadowMap_VS.glsl", "ShadowMap_FS.glsl");
 	Shader * debugDepthQuad = new Shader("Debug_VS.glsl", "Debug_FS.glsl");
+	kdTreeShader = new Shader("SimpleDraw_VS.glsl","SimpleDraw_FS.glsl");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -319,7 +325,6 @@ int main()
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
 	// shader configuration
 	// --------------------
 	shader->use();
@@ -328,9 +333,21 @@ int main()
 	debugDepthQuad->setInt("depthMap", 0);
 
 
-
 	setSamples();
 	
+	//Init KDTree
+	glm::mat4 model = glm::mat4(1.0f);
+
+	std::vector<Point> points = std::vector<Point>();
+
+	for (int i = 0; i < worldObjects.size(); i++) {
+		std::vector<Point> verts = worldObjects[i]->GetVertices(i, model);
+
+		points.insert(points.end(), verts.begin(), verts.end());
+	}
+
+	kdTree = new KDTree(points);
+
 	// render loop
 	// -----------
 	while (!glfwWindowShouldClose(window))
@@ -354,7 +371,7 @@ int main()
 		// --------------------------------------------------------------
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
-		float near_plane = 1.0f, far_plane = 50.0f;
+		float near_plane = 1.0f, far_plane = 100.0f;
 		lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
 		lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0));
 		lightSpaceMatrix = lightProjection * lightView;
@@ -379,7 +396,7 @@ int main()
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shader->use();
-		glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 		shader->setMat4("projection", projection);
 		shader->setMat4("view", view);
@@ -392,6 +409,11 @@ int main()
 		glActiveTexture(GL_TEXTURE8);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
 		renderScene(shader, false);
+
+		kdTreeShader->use();
+		kdTreeShader->setMat4("projection", projection);
+		kdTreeShader->setMat4("view", view);
+		kdTree->drawWireframe(kdTreeShader, model);
 
 		// render Depth map to quad for visual debugging
 		// ---------------------------------------------
@@ -406,7 +428,7 @@ int main()
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
+		
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
 		glfwSwapBuffers(window);
@@ -435,6 +457,7 @@ void renderScene(const Shader * shader, bool lightning)
 	{
 		lights[i]->render(shader, model);
 	}
+
 }
 
 

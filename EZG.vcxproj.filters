@@ -36,6 +36,12 @@
     <ClCompile Include="Transform.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="kdTree.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Ray.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.hpp">
@@ -56,6 +62,15 @@
     <ClInclude Include="src\stb_image.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="kdTree.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="MathDefines.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Depth_VS.glsl">
@@ -74,6 +89,12 @@
       <Filter>Ressourcendateien</Filter>
     </None>
     <None Include="Debug_VS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="SimpleDraw_VS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="SimpleDraw_FS.glsl">
       <Filter>Ressourcendateien</Filter>
     </None>
   </ItemGroup>

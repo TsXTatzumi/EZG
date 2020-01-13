@@ -89,7 +89,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -124,8 +128,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="kdTree.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="Transform.cpp" />
@@ -133,7 +139,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="kdTree.h" />
+    <ClInclude Include="MathDefines.h" />
     <ClInclude Include="Model.hpp" />
+    <ClInclude Include="Ray.h" />
     <ClInclude Include="Shader.hpp" />
     <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="Transform.hpp" />
@@ -146,6 +155,8 @@
     <None Include="Empty_FS.glsl" />
     <None Include="ShadowMap_FS.glsl" />
     <None Include="ShadowMap_VS.glsl" />
+    <None Include="SimpleDraw_FS.glsl" />
+    <None Include="SimpleDraw_VS.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
