@@ -28,6 +28,9 @@ void renderScene(const Shader * shader, bool lightning);
 
 void renderQuad();
 
+float max_RayLength = 1000.0f;
+void rayCast();
+
 GLuint framebuffer;
 GLuint samples = 1;
 
@@ -60,6 +63,8 @@ std::vector<WorldObject*> lights;
 //KDTree
 KDTree * kdTree;
 Shader* kdTreeShader;
+
+bool fireRay = false;
 
 void setSamples()
 {
@@ -481,10 +486,24 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, depthMap);
 		renderScene(shader, false);
 
+		//kd Tree
+		glm::vec3 color = glm::vec3(0.8f, 1.0f, 0.0f);
+
 		kdTreeShader->use();
 		kdTreeShader->setMat4("projection", projection);
 		kdTreeShader->setMat4("view", view);
+		kdTreeShader->setVec3("color", color);
 		kdTree->drawWireframe(kdTreeShader, model);
+
+		//Ray
+
+		/*
+		if (fireRay) {
+			color = glm::vec3(0.0f, 1.0f, 0.0f);
+			kdTreeShader->setVec3("color", color);
+			glLineWidth(5);
+			rayCast();
+		}*/
 
 		// render Depth map to quad for visual debugging
 		// ---------------------------------------------
@@ -568,10 +587,44 @@ void renderQuad()
 	glBindVertexArray(0);
 }
 
+unsigned int rayVAO = 0;
+unsigned int rayVBO;
+void rayCast() {
+	if (rayVAO == 0)
+	{
+		float rayVertices[] = {
+			// positions        // texture Coords
+			 0.0f,  0.0f, 0.0f,
+			 max_RayLength,  0.0f, 0.0f,
+		};
+		// setup plane VAO
+		glGenVertexArrays(1, &rayVAO);
+		glGenBuffers(1, &rayVBO);
+		glBindVertexArray(rayVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, rayVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(rayVertices), &rayVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(3 * sizeof(float)));
+	}
+	glBindVertexArray(rayVAO);
+	glDrawArrays(GL_LINE_STRIP, 0, 2);
+	glBindVertexArray(0);
+}
+
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+	{
+		std::cout << "Ray\n";
+		fireRay = true;
+		
+		while (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) glfwPollEvents();
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS)
 	{
 		b_edit = !b_edit;
