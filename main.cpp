@@ -29,7 +29,7 @@ void renderScene(const Shader * shader, bool lightning);
 void renderQuad();
 
 float max_RayLength = 1000.0f;
-void rayCast();
+void rayCast(GLuint vao, GLuint vbo);
 
 GLuint framebuffer;
 GLuint samples = 1;
@@ -64,7 +64,10 @@ std::vector<WorldObject*> lights;
 KDTree * kdTree;
 Shader* kdTreeShader;
 
+Ray ray;
+
 bool fireRay = false;
+glm::mat4 rayModel = glm::mat4(1.0f);
 
 void setSamples()
 {
@@ -338,6 +341,7 @@ int main()
 	Shader * shader = new Shader("ShadowMap_VS.glsl", "ShadowMap_FS.glsl");
 	Shader * debugDepthQuad = new Shader("Debug_VS.glsl", "Debug_FS.glsl");
 	kdTreeShader = new Shader("SimpleDraw_VS.glsl","SimpleDraw_FS.glsl");
+	Shader* colorShader = new Shader("Debug_VS.glsl", "Debug_FS.glsl");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -497,13 +501,14 @@ int main()
 
 		//Ray
 
-		/*
+		
 		if (fireRay) {
+			
 			color = glm::vec3(0.0f, 1.0f, 0.0f);
 			kdTreeShader->setVec3("color", color);
 			glLineWidth(5);
-			rayCast();
-		}*/
+			rayCast(kdTree->VAO, kdTree->VBO);
+		}
 
 		// render Depth map to quad for visual debugging
 		// ---------------------------------------------
@@ -571,6 +576,7 @@ void renderQuad()
 			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
 			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
 		};
+
 		// setup plane VAO
 		glGenVertexArrays(1, &quadVAO);
 		glGenBuffers(1, &quadVBO);
@@ -582,33 +588,45 @@ void renderQuad()
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	}
+
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }
 
-unsigned int rayVAO = 0;
-unsigned int rayVBO;
-void rayCast() {
-	if (rayVAO == 0)
-	{
-		float rayVertices[] = {
-			// positions        // texture Coords
-			 0.0f,  0.0f, 0.0f,
-			 max_RayLength,  0.0f, 0.0f,
-		};
-		// setup plane VAO
-		glGenVertexArrays(1, &rayVAO);
-		glGenBuffers(1, &rayVBO);
-		glBindVertexArray(rayVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, rayVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(rayVertices), &rayVertices, GL_STATIC_DRAW);
+void rayCast(GLuint vao, GLuint vbo) {
+
+	if (vao == 0) {
+		glGenVertexArrays(1, &vao);
+		glGenBuffers(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(3 * sizeof(float)));
 	}
-	glBindVertexArray(rayVAO);
+	
+	float rayVertices[] = {
+		// positions        // texture Coords
+		0.0f,  0.0f, 0.0f,
+		0.0f, 0.0f, -max_RayLength
+	};
+
+	glm::vec3 vert = rayModel * glm::vec4(rayVertices[0], rayVertices[1], rayVertices[2], 1);
+	rayVertices[0] = vert.x;
+	rayVertices[1] = vert.y;
+	rayVertices[2] = vert.z;
+
+	vert = rayModel * glm::vec4(rayVertices[3], rayVertices[4], rayVertices[5], 1);
+	rayVertices[3] = vert.x;
+	rayVertices[4] = vert.y;
+	rayVertices[5] = vert.z;
+
+	// setup plane VAO
+	
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(rayVertices), &rayVertices);
+	
+	glBindVertexArray(vao);
 	glDrawArrays(GL_LINE_STRIP, 0, 2);
 	glBindVertexArray(0);
 }
@@ -621,6 +639,27 @@ void processInput(GLFWwindow *window)
 	{
 		std::cout << "Ray\n";
 		fireRay = true;
+
+		rayModel = glm::mat4(1.0f);
+		rayModel = glm::translate(rayModel, camera.location);
+		rayModel = glm::rotate(rayModel, angle(camera.rotation), axis(camera.rotation));
+
+		float rayVertices[] = {
+			// positions        // texture Coords
+			0.0f,  0.0f, 0.0f,
+			0.0f, 0.0f, -max_RayLength
+		};
+
+		glm::vec3 start = rayModel * glm::vec4(rayVertices[0], rayVertices[1], rayVertices[2], 1);
+
+		glm::vec3 end = rayModel * glm::vec4(rayVertices[3], rayVertices[4], rayVertices[5], 1);
+	
+
+		ray = Ray(start, end);
+
+		std::vector<Point> triangel = kdTree->intersect(ray);
+
+		std::cout << "ID: " << triangel[0].objID <<  "X: " << triangel[0].x << "Y: " << triangel[0].y << "Z: " << triangel[0].z << "\n";
 		
 		while (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) glfwPollEvents();
 	}
