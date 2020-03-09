@@ -1,8 +1,11 @@
 #version 330 core
 out vec4 FragColor;
 
+in VS_OUT {
+    vec3 color;
+} vs_in;
+
 void main()
 {
-	//gl_FragDepth = gl_FragCoord.z;
-	FragColor = vec4(0.8,1,0,1);
+	FragColor = vec4(vs_in.color,1);
 }

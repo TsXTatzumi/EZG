@@ -9,17 +9,19 @@
 class Ray
 {
 public:
-	Point orig;		//Startpounkt
-	glm::vec3 dir;		//Richtungsvektor
+	glm::vec3 m_start;		//Startpounkt
+	glm::vec3 m_end;
 	float minT;
 	float maxT;
 
 public:
 	Ray();
 
-	Ray(const Point& o, const glm::vec3& d, float mint = 0.001f, float maxt = INF);
+	Ray(const glm::vec3& start, const glm::vec3& end, float mint = 0.001f, float maxt = INF);
 
 	~Ray();
+
+	glm::vec3 dir;		//Richtungsvektor
 };
 
 #endif // !RAY_H

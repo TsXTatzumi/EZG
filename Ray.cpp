@@ -3,8 +3,8 @@
 Ray::Ray() : minT(0.001f), maxT(INF) {
 }
 
-Ray::Ray(const Point& o, const glm::vec3& d, float mint, float maxt) : orig(o), dir(d), minT(mint), maxT(maxt) {
-	dir = glm::normalize(dir);
+Ray::Ray(const glm::vec3& start, const glm::vec3& end, float mint, float maxt) : m_start(start), m_end(end), minT(mint), maxT(maxt) {
+	dir = glm::normalize(end - start);
 }
 
 Ray::~Ray()

@@ -22,10 +22,12 @@ KDTree::Node* KDTree::deepcopyTree(typename KDTree::Node* root) {
 
 
 KDTree::Node* KDTree::buildTree(typename std::vector<Point>::iterator start, typename std::vector<Point>::iterator end, int currLevel) {
+	m_StartIt = start;
+
 	if (start >= end) return NULL; // empty tree
 
 	//std::cout << "Lambda: \n";
-	int axis = currLevel % m_dimension; // the axis to split on
+	int axis = currLevel % m_dimension; // TODO split on max dimension
 	auto cmp = [axis](const Point& p1, const Point p2) {
 		return p1[axis] < p2[axis];
 	};
@@ -54,15 +56,15 @@ KDTree::Node* KDTree::buildTree(typename std::vector<Point>::iterator start, typ
 		m_maxLevel = m_maxLevel + 1;
 	}
 
-	Node* newNode = new Node(*mid, currLevel);
+	Node* newNode = new Node(mid, currLevel);
 
 	newNode->m_axis = axis;
 	//std::cout << "m_cutingEdge: \n";
 	if (mid == (end - 1)) {
-		newNode->m_cutingEdge = ((*mid)[axis] + (*(mid - 1))[axis]) / 2.0;
+		newNode->m_cuttingEdge = ((*mid)[axis] + (*(mid - 1))[axis]) / 2.0;
 	}
 	else {
-		newNode->m_cutingEdge = (((*mid)[axis] + (*(mid + 1))[axis]) / 2.0f);
+		newNode->m_cuttingEdge = (((*mid)[axis] + (*(mid + 1))[axis]) / 2.0f);
 	}
 	//std::cout << "35: \n";
 
@@ -142,7 +144,7 @@ std::size_t KDTree::dimension() const {
 }
 
 KDTree::KDTree(const KDTree& rhs) {
-	
+
 
 	m_root = deepcopyTree(rhs.m_root);
 	m_size = rhs.m_size;
@@ -194,14 +196,14 @@ void KDTree::drawWireframe(const Shader* shader, glm::mat4 model)
 	boundingBox.push_back(glm::vec3(m_minBound.x, m_maxBound.y, m_minBound.z));
 	boundingBox.push_back(glm::vec3(m_maxBound.x, m_maxBound.y, m_minBound.z));
 
-	
+
 
 	glBufferData(GL_ARRAY_BUFFER, boundingBox.size() * sizeof(glm::vec3), &boundingBox[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*)0);
 
-	glLineWidth(m_maxLevel / (0.0f+4.0f));
+	glLineWidth(m_maxLevel / (0.0f + 4.0f));
 	//Draw Cube
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_LINES, 0, boundingBox.size());
@@ -218,38 +220,38 @@ void KDTree::drawWireframeRecursive(const Shader* shader, glm::mat4 model, glm::
 	switch (node->m_axis)
 	{
 	case 0:
-		plane.push_back(glm::vec3(node->m_cutingEdge, minBound.y, minBound.z));
-		plane.push_back(glm::vec3(node->m_cutingEdge, minBound.y, maxBound.z));
-		plane.push_back(glm::vec3(node->m_cutingEdge, minBound.y, maxBound.z));
-		plane.push_back(glm::vec3(node->m_cutingEdge, maxBound.y, maxBound.z));
-		plane.push_back(glm::vec3(node->m_cutingEdge, maxBound.y, maxBound.z));
-		plane.push_back(glm::vec3(node->m_cutingEdge, maxBound.y, minBound.z));
-		plane.push_back(glm::vec3(node->m_cutingEdge, maxBound.y, minBound.z));
-		plane.push_back(glm::vec3(node->m_cutingEdge, minBound.y, minBound.z));
+		plane.push_back(glm::vec3(node->m_cuttingEdge, minBound.y, minBound.z));
+		plane.push_back(glm::vec3(node->m_cuttingEdge, minBound.y, maxBound.z));
+		plane.push_back(glm::vec3(node->m_cuttingEdge, minBound.y, maxBound.z));
+		plane.push_back(glm::vec3(node->m_cuttingEdge, maxBound.y, maxBound.z));
+		plane.push_back(glm::vec3(node->m_cuttingEdge, maxBound.y, maxBound.z));
+		plane.push_back(glm::vec3(node->m_cuttingEdge, maxBound.y, minBound.z));
+		plane.push_back(glm::vec3(node->m_cuttingEdge, maxBound.y, minBound.z));
+		plane.push_back(glm::vec3(node->m_cuttingEdge, minBound.y, minBound.z));
 		break;
 	case 1:
-		plane.push_back(glm::vec3(minBound.x, node->m_cutingEdge, minBound.z));
-		plane.push_back(glm::vec3(minBound.x, node->m_cutingEdge, maxBound.z));
-		plane.push_back(glm::vec3(minBound.x, node->m_cutingEdge, maxBound.z));
-		plane.push_back(glm::vec3(maxBound.x, node->m_cutingEdge, maxBound.z));
-		plane.push_back(glm::vec3(maxBound.x, node->m_cutingEdge, maxBound.z));
-		plane.push_back(glm::vec3(maxBound.x, node->m_cutingEdge, minBound.z));
-		plane.push_back(glm::vec3(maxBound.x, node->m_cutingEdge, minBound.z));
-		plane.push_back(glm::vec3(minBound.x, node->m_cutingEdge, minBound.z));
+		plane.push_back(glm::vec3(minBound.x, node->m_cuttingEdge, minBound.z));
+		plane.push_back(glm::vec3(minBound.x, node->m_cuttingEdge, maxBound.z));
+		plane.push_back(glm::vec3(minBound.x, node->m_cuttingEdge, maxBound.z));
+		plane.push_back(glm::vec3(maxBound.x, node->m_cuttingEdge, maxBound.z));
+		plane.push_back(glm::vec3(maxBound.x, node->m_cuttingEdge, maxBound.z));
+		plane.push_back(glm::vec3(maxBound.x, node->m_cuttingEdge, minBound.z));
+		plane.push_back(glm::vec3(maxBound.x, node->m_cuttingEdge, minBound.z));
+		plane.push_back(glm::vec3(minBound.x, node->m_cuttingEdge, minBound.z));
 		break;
 	case 2:
-		plane.push_back(glm::vec3(minBound.x, minBound.y, node->m_cutingEdge));
-		plane.push_back(glm::vec3(minBound.x, maxBound.y, node->m_cutingEdge));
-		plane.push_back(glm::vec3(minBound.x, maxBound.y, node->m_cutingEdge));
-		plane.push_back(glm::vec3(maxBound.x, maxBound.y, node->m_cutingEdge));
-		plane.push_back(glm::vec3(maxBound.x, maxBound.y, node->m_cutingEdge));
-		plane.push_back(glm::vec3(maxBound.x, minBound.y, node->m_cutingEdge));
-		plane.push_back(glm::vec3(maxBound.x, minBound.y, node->m_cutingEdge));
-		plane.push_back(glm::vec3(minBound.x, minBound.y, node->m_cutingEdge));
+		plane.push_back(glm::vec3(minBound.x, minBound.y, node->m_cuttingEdge));
+		plane.push_back(glm::vec3(minBound.x, maxBound.y, node->m_cuttingEdge));
+		plane.push_back(glm::vec3(minBound.x, maxBound.y, node->m_cuttingEdge));
+		plane.push_back(glm::vec3(maxBound.x, maxBound.y, node->m_cuttingEdge));
+		plane.push_back(glm::vec3(maxBound.x, maxBound.y, node->m_cuttingEdge));
+		plane.push_back(glm::vec3(maxBound.x, minBound.y, node->m_cuttingEdge));
+		plane.push_back(glm::vec3(maxBound.x, minBound.y, node->m_cuttingEdge));
+		plane.push_back(glm::vec3(minBound.x, minBound.y, node->m_cuttingEdge));
 		break;
 	}
 
-	
+
 	glLineWidth(m_maxLevel / (currLevel + 4.0f));
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, plane.size() * sizeof(glm::vec3), &plane[0]);
@@ -257,16 +259,16 @@ void KDTree::drawWireframeRecursive(const Shader* shader, glm::mat4 model, glm::
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_LINES, 0, plane.size());
 	glBindVertexArray(0);
-	
+
 
 	if (node->m_left != nullptr) {
 		glm::vec3 newMax = maxBound;
-		newMax[node->m_axis] = node->m_cutingEdge; //TODO Check ob das mit [] überhaupt richtig ist
-		drawWireframeRecursive(shader, model, minBound, newMax, node->m_left, currLevel +1);
+		newMax[node->m_axis] = node->m_cuttingEdge; //TODO Check ob das mit [] überhaupt richtig ist
+		drawWireframeRecursive(shader, model, minBound, newMax, node->m_left, currLevel + 1);
 	}
 	if (node->m_right != nullptr) {
 		glm::vec3 newMin = minBound;
-		minBound[node->m_axis] = node->m_cutingEdge; //TODO Check ob das mit [] überhaupt richtig ist
+		minBound[node->m_axis] = node->m_cuttingEdge; //TODO Check ob das mit [] überhaupt richtig ist
 		drawWireframeRecursive(shader, model, newMin, maxBound, node->m_right, currLevel + 1);
 	}
 }
@@ -283,9 +285,9 @@ bool KDTree::empty() const {
 
 
 KDTree::Node* KDTree::findNode(typename KDTree::Node* currNode, const Point& pt) const {
-	if (currNode == NULL || currNode->m_point == pt) return currNode;
+	if (currNode == NULL || *(currNode->m_PointIt) == pt) return currNode;
 
-	const Point& currPoint = currNode->m_point;
+	const Point& currPoint = *(currNode->m_PointIt);
 	int currLevel = currNode->m_level;
 	if (pt[currLevel % m_dimension] < currPoint[currLevel % m_dimension]) { // recurse to the left side
 		return currNode->m_left == NULL ? currNode : findNode(currNode->m_left, pt);
@@ -298,10 +300,10 @@ KDTree::Node* KDTree::findNode(typename KDTree::Node* currNode, const Point& pt)
 
 bool KDTree::contains(const Point& pt) const {
 	auto node = findNode(m_root, pt);
-	return node != NULL && node->m_point == pt;
+	return node != NULL && *(node->m_PointIt) == pt;
 }
 
-
+/*
 void KDTree::insert(const Point& pt) {
 	auto targetNode = findNode(m_root, pt);
 	if (targetNode == NULL) { // this means the tree is empty
@@ -309,13 +311,13 @@ void KDTree::insert(const Point& pt) {
 		m_size = 1;
 	}
 	else {
-		if (targetNode->m_point == pt) { // pt is already in the tree, simply update its value
+		if (*(targetNode->m_PointIt) == pt) { // pt is already in the tree, simply update its value
 			//targetNode->m_value = value;
 		}
 		else { // construct a new node and insert it to the right place (child of targetNode)
 			int currLevel = targetNode->m_level;
 			Node* newNode = new Node(pt, currLevel + 1);
-			if (pt[currLevel % m_dimension] < targetNode->m_point[currLevel % m_dimension]) {
+			if (pt[currLevel % m_dimension] < targetNode->m_PointIt[currLevel % m_dimension]) {
 				targetNode->m_left = newNode;
 			}
 			else {
@@ -325,15 +327,13 @@ void KDTree::insert(const Point& pt) {
 		}
 	}
 }
-
-
 const Point& KDTree::at(const Point& pt) const {
 	auto node = findNode(m_root, pt);
-	if (node == NULL || node->m_point != pt) {
+	if (node == NULL || node->m_PointIt) != pt) {
 		throw std::out_of_range("Point not found in the KD-Tree");
 	}
 	else {
-		return node->m_point;
+		return node->m_PointIt);
 	}
 }
 
@@ -346,173 +346,206 @@ Point& KDTree::at(const Point& pt) {
 
 Point& KDTree::operator[](const Point& pt) {
 	auto node = findNode(m_root, pt);
-	if (node != NULL && node->m_point == pt) { // pt is already in the tree
-		return node->m_point;
+	if (node != NULL && node->m_PointIt) == pt) { // pt is already in the tree
+		return node->m_PointIt);
 	}
 	else { // insert pt with default Point value, and return reference to the new Point
 		insert(pt);
-		if (node == NULL) return m_root->m_point; // the new node is the root
-		else return (node->m_left != NULL && node->m_left->m_point == pt) ? node->m_left->m_point : node->m_right->m_point;
+		if (node == NULL) return m_root->m_PointIt); // the new node is the root
+		else return (node->m_left != NULL && node->m_left->m_PointIt) == pt) ? node->m_left->m_PointIt) : node->m_right->m_PointIt);
 	}
 }
+*/
 
-/*
-void KDTree::nearestNeighborRecurse(const typename KDTree::Node* currNode, const Point& key, BoundedPQueue<Point>& pQueue) const {
-	if (currNode == NULL) return;
-	const Point& currPoint = currNode->m_point;
+std::vector<Point> KDTree::intersect(const Ray& ray) {
 
-	// Add the current point to the BPQ if it is closer to 'key' that some point in the BPQ
-	pQueue.enqueue(currNode->m_value, Distance(currPoint, key));
+	return intersect(ray, m_minBound, m_maxBound, m_root, 0);
+}
 
-	// Recursively search the half of the tree that contains Point 'key'
-	int currLevel = currNode->m_level;
-	bool isLeftTree;
-	if (key[currLevel % m_dimension] < currPoint[currLevel % m_dimension]) {
-		nearestNeighborRecurse(currNode->m_left, key, pQueue);
-		isLeftTree = true;
+bool isInBox(const Ray& ray, glm::vec3 minBound, glm::vec3 maxBound) {
+
+	int axis[3];
+
+	if (ray.dir.x - glm::normalize(maxBound - ray.m_start).x) {
+		axis[0] += 1;
 	}
 	else {
-		nearestNeighborRecurse(currNode->m_right, key, pQueue);
-		isLeftTree = false;
+		axis[0] -= 1;
 	}
 
-	if (pQueue.size() < pQueue.maxSize() || fabs(key[currLevel % m_dimension] - currPoint[currLevel % m_dimension]) < pQueue.worst()) {
-		// Recursively search the other half of the tree if necessary
-		if (isLeftTree) nearestNeighborRecurse(currNode->m_right, key, pQueue);
-		else nearestNeighborRecurse(currNode->m_left, key, pQueue);
+	if (ray.dir.y - glm::normalize(maxBound - ray.m_start).y) {
+		axis[1] += 1;
 	}
+	else {
+		axis[1] -= 1;
+	}
+
+	if (ray.dir.z - glm::normalize(maxBound - ray.m_start).z) {
+		axis[2] += 1;
+	}
+	else {
+		axis[2] -= 1;
+	}
+
+	if (ray.dir.x - glm::normalize(maxBound - ray.m_start).x) {
+		axis[0] += 1;
+	}
+	else {
+		axis[0] -= 1;
+	}
+
+	if (ray.dir.y - glm::normalize(maxBound - ray.m_start).y) {
+		axis[1] += 1;
+	}
+	else {
+		axis[1] -= 1;
+	}
+
+	if (ray.dir.z - glm::normalize(maxBound - ray.m_start).z) {
+		axis[2] += 1;
+	}
+	else {
+		axis[2] -= 1;
+	}
+
+	return !(axis[0] + axis[1] + axis[2]);
 }
-*/
 
-/*
-Point KDTree::kNNValue(const Point& key, std::size_t k) const {
-	BoundedPQueue<Point> pQueue(k); // BPQ with maximum size k
-	if (empty()) return Point(); // default return value if KD-tree is empty
-
-	// Recursively search the KD-tree with pruning
-	nearestNeighborRecurse(m_root, key, pQueue);
-
-	// Count occurrences of all Point in the kNN set
-	std::unordered_map<Point, int> counter;
-	while (!pQueue.empty()) {
-		++counter[pQueue.dequeueMin()];
-	}
-
-	// Return the most frequent element in the kNN set
-	Point result;
-	int cnt = -1;
-	for (const auto& p : counter) {
-		if (p.second > cnt) {
-			result = p.first;
-			cnt = p.second;
-		}
-	}
-	return result;
-}
-*/
-
-/*
-bool KDTree::intersect(const Ray& ray)
+std::vector<Point> KDTree::intersect(const Ray& ray, glm::vec3 minBound, glm::vec3 maxBound, Node* node, int currLevel)
 {
-	// Intersection test the ray against the tree bounding box.
-	float tmin, tmax;
-	if (!mWorldBox.intersect(ray, tmin, tmax)) return false;
+	bool inBox = isInBox(ray, minBound, maxBound);
 
-	// Prepare for tree traversal.
-	unsigned int rayId = ++mCurrentRayId;	// get new ray id
-	Vector invDir = 1.0f / ray.dir;			// compute reciprocal ray direction
-	int current = 0;						// current node
-	mNodesTodo.resize(0);					// clear node todo list, this shouldn't clear previously reserved mem
-	bool hit = false;
+	if (!inBox) {
+		return std::vector<Point>();
+	}
 
-	// Traverse the tree until the ray exists or hits something.
-	while (true)
-	{
-		if (ray.maxT < tmin) break;
-		node& currentNode = mNodes[current];
+	if ((node->m_right != nullptr) && (node->m_left != nullptr)) {
+		switch (node->m_axis) {
+		case 0:
+			//X
+			if (ray.m_start.x > node->m_cuttingEdge) {
 
-		if (!currentNode.isLeaf())		// process interior node
-		{
-			// Compute splitting plane intersection time.
-			int axis = currentNode.getAxis();
-			float split = currentNode.getSplit();
-			float orig = ray.orig(axis);
-			float t = (split - orig) * invDir(axis);
+				glm::vec3 newMin = minBound;
+				minBound[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, newMin, maxBound, node->m_right, currLevel + 1);
 
-			// Choose traversal order based on ray origin.
-			int first, second;
-			if (orig <= split)
-			{
-				first = current + 1;
-				second = currentNode.getFarChild();
+				glm::vec3 newMax = maxBound;
+				newMax[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, minBound, newMax, node->m_left, currLevel + 1);
+
+
 			}
-			else
-			{
-				first = currentNode.getFarChild();
-				second = current + 1;
+			else {
+				glm::vec3 newMax = maxBound;
+				newMax[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, minBound, newMax, node->m_left, currLevel + 1);
+
+				glm::vec3 newMin = minBound;
+				minBound[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, newMin, maxBound, node->m_right, currLevel + 1);
+
+			}
+			break;
+		case 1:
+			//Y
+			if (ray.m_start.y > node->m_cuttingEdge) {
+
+				glm::vec3 newMin = minBound;
+				minBound[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, newMin, maxBound, node->m_right, currLevel + 1);
+
+				glm::vec3 newMax = maxBound;
+				newMax[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, minBound, newMax, node->m_left, currLevel + 1);
+
+
+			}
+			else {
+				glm::vec3 newMax = maxBound;
+				newMax[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, minBound, newMax, node->m_left, currLevel + 1);
+
+				glm::vec3 newMin = minBound;
+				minBound[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, newMin, maxBound, node->m_right, currLevel + 1);
+
 			}
 
-			// Check if we need to traverse both children of just one side.
-			if (t > tmax || t < 0.0f)	// first only
-				current = first;
-			else if (t < tmin)			// second only
-				current = second;
-			else					// both, put second in todo list
-			{
-				mNodesTodo.push_back(nodeTodo(second, t, tmax));
-				current = first;
-				tmax = t;
+			break;
+		case 2:
+			//Z
+			if (ray.m_start.z > node->m_cuttingEdge) {
+
+				glm::vec3 newMin = minBound;
+				minBound[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, newMin, maxBound, node->m_right, currLevel + 1);
+
+				glm::vec3 newMax = maxBound;
+				newMax[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, minBound, newMax, node->m_left, currLevel + 1);
+
+
 			}
+			else {
+				glm::vec3 newMax = maxBound;
+				newMax[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, minBound, newMax, node->m_left, currLevel + 1);
+
+				glm::vec3 newMin = minBound;
+				minBound[node->m_axis] = node->m_cuttingEdge;
+				intersect(ray, newMin, maxBound, node->m_right, currLevel + 1);
+			}
+			break;
 		}
-		else		// process leaf node
-		{
-			// Process leaf node by checking for intersections with objects in leaf.
-			int numObjs = currentNode.getNum();
-			if (numObjs == 1)
-			{
-				// Just one object in node
-				object& obj = currentNode.getObj();
-				if (obj.lastId != rayId)		// check mailbox id so we are not testing the same object twice
-				{
-					obj.lastId = rayId;
-					if (obj.ptr->intersect(ray))
-					{
-						hit = true;
-						break;				// return true on first intersection
-					}
-				}
-			}
-			else
-			{
-				// More than one object, loop over objects
-				for (int i = 0; i < numObjs; i++)
-				{
-					object& obj = currentNode.getObj(i);
-					if (obj.lastId != rayId)		// check mailbox id so we are not testing the same object twice
-					{
-						obj.lastId = rayId;
-						if (obj.ptr->intersect(ray))
-						{
-							hit = true;
-							break;				// return true on first intersection
-						}
-					}
-				}
-			}
+	}
+	else {
+		std::vector<Point> triangel = std::vector<Point>();
+		int index = node->m_PointIt - m_StartIt;
+		index = index / 3;
 
-			// Check todo list for next node to process. If empty, the ray has passed
-			// through the tree without hitting anything.
-			if (!mNodesTodo.empty())
-			{
-				current = mNodesTodo.back().idx;
-				tmin = mNodesTodo.back().tmin;
-				tmax = mNodesTodo.back().tmax;
-				mNodesTodo.pop_back();
-			}
-			else break;
+		glm::vec3 p1 = glm::vec3((m_StartIt + index)->x, (m_StartIt + index)->y, (m_StartIt + index)->z);
+		glm::vec3 p2 = glm::vec3((m_StartIt + index + 1)->x, (m_StartIt + index + 1)->y, (m_StartIt + index + 1)->z);
+		glm::vec3 p3 = glm::vec3((m_StartIt + index + 2)->x, (m_StartIt + index + 2)->y, (m_StartIt + index + 2)->z);
+
+
+		if (rayTriangleIntersect(ray, p1, p2, p3)) {
+			triangel.push_back(*(m_StartIt + index));
+			triangel.push_back(*(m_StartIt + index + 1));
+			triangel.push_back(*(m_StartIt + index + 2));
+			return triangel;
 		}
 	}
 
-	return hit;
+	return std::vector<Point>();
 }
-*/
+
+float KDTree::rayTriangleIntersect(const Ray& r, glm::vec3& v0, glm::vec3& v1, glm::vec3& v2)
+{
+	glm::vec3 v0v1 = v1 - v0;
+	glm::vec3 v0v2 = v2 - v0;
+
+	glm::vec3 pvec = glm::cross(r.dir, v0v2);
+
+	float det = dot(v0v1, pvec);
+
+	if (det < 0.000001)
+		return -INFINITY;
+
+	float invDet = 1.0 / det;
+
+	glm::vec3 tvec = r.m_start - v0;
+
+	float u = glm::dot(tvec, pvec) * invDet;
+
+	if (u < 0 || u > 1)
+		return -INFINITY;
+
+	glm::vec3 qvec = cross(tvec, v0v1);
+
+	float v = dot(r.dir, qvec) * invDet;
+
+	if (v < 0 || u + v > 1)
+		return -INFINITY;
+
+	return glm::dot(v0v2, qvec) * invDet;
+}
