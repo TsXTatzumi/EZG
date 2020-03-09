@@ -45,6 +45,9 @@
     <ClCompile Include="Spline.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="Chunk.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.hpp">
@@ -77,18 +80,12 @@
     <ClInclude Include="Spline.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Chunk.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Depth_VS.glsl">
-      <Filter>Ressourcendateien</Filter>
-    </None>
-    <None Include="Empty_FS.glsl">
-      <Filter>Ressourcendateien</Filter>
-    </None>
     <None Include="ShadowMap_FS.glsl">
-      <Filter>Ressourcendateien</Filter>
-    </None>
-    <None Include="ShadowMap_VS.glsl">
       <Filter>Ressourcendateien</Filter>
     </None>
     <None Include="Debug_FS.glsl">
@@ -101,6 +98,15 @@
       <Filter>Ressourcendateien</Filter>
     </None>
     <None Include="SimpleDraw_FS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="Chunk_VS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="GenerateChunk_FS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="GenerateChunk_CS.glsl">
       <Filter>Ressourcendateien</Filter>
     </None>
   </ItemGroup>

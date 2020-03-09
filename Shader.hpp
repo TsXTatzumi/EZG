@@ -16,7 +16,8 @@ public:
 	unsigned int ID;
 
 	// constructor reads and builds the shader
-	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+	Shader(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* geometryPath = nullptr);
+	Shader(const char* computePath);
 	// use/activate the shader
 	void use();
 	// utility uniform functions
@@ -25,6 +26,10 @@ public:
 	void setFloat(const std::string &name, float value) const;
 	void setMat4(const std::string &name, glm::mat4 & value) const;
 	void setVec3(const std::string &name, glm::vec3 & value) const;
+
+private:
+
+	void checkCompileErrors(GLuint shader, std::string type);
 };
 
 #endif

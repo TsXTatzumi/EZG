@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="kdTree.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -140,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="Chunk.h" />
     <ClInclude Include="kdTree.h" />
     <ClInclude Include="MathDefines.h" />
     <ClInclude Include="Model.hpp" />
@@ -153,10 +155,10 @@
   <ItemGroup>
     <None Include="Debug_FS.glsl" />
     <None Include="Debug_VS.glsl" />
-    <None Include="Depth_VS.glsl" />
-    <None Include="Empty_FS.glsl" />
+    <None Include="GenerateChunk_CS.glsl" />
+    <None Include="GenerateChunk_FS.glsl" />
     <None Include="ShadowMap_FS.glsl" />
-    <None Include="ShadowMap_VS.glsl" />
+    <None Include="Chunk_VS.glsl" />
     <None Include="SimpleDraw_FS.glsl" />
     <None Include="SimpleDraw_VS.glsl" />
   </ItemGroup>

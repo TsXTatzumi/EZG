@@ -1,1 +1,10 @@
-﻿
+﻿  main.cpp
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(41,13): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(42,13): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(150,22): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(310,17): warning C4305: "/=": Verkürzung von "double" in "float"
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(327,27): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(328,28): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(340,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(341,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+  EZG.vcxproj -> E:\Dokumente\FH\Abgaben\repos\EZG\Debug\EZG.exe

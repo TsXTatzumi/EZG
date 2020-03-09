@@ -18,6 +18,7 @@ Model::~Model()
 
 void Model::setupMesh()
 {
+	
 	glGenVertexArrays(1, &this->VAO);
 	glGenBuffers(1, &this->VBO);
 	glGenBuffers(1, &this->EBO);
