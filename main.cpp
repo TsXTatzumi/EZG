@@ -85,7 +85,7 @@ int main()
 	// glfw: initialize and configure
 	// ------------------------------
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -122,7 +122,7 @@ int main()
 	// build and compile shaders
 	// -------------------------
 	Shader * generateShader = new Shader("GenerateChunk_CS.glsl");
-	//Shader * shader = new Shader("Chunk_VS.glsl", "ShadowMap_FS.glsl");
+	Shader * chunkShader = new Shader("Chunk_VS.glsl", "ShadowMap_FS.glsl");
 	//Shader * debugDepthQuad = new Shader("Debug_VS.glsl", "Debug_FS.glsl");
 
 	// shader configuration
@@ -131,7 +131,7 @@ int main()
 	setSamples();
 
 	// 
-	Chunk::Init(chunksize);
+	Chunk::Init(chunksize, generateShader, chunkShader);
 	for (unsigned int x = 0; x < num_chunks; ++x)
 	{
 		for (unsigned int y = 0; y < num_chunks; ++y)
@@ -195,7 +195,13 @@ void renderScene(const Shader * shader, bool lightning)
 {
 	glm::mat4 model = glm::mat4(1.0f);
 
-
+	for (unsigned int x = 0; x < num_chunks; ++x)
+	{
+		for (unsigned int y = 0; y < num_chunks; ++y)
+		{
+			chunks[x][y]->render(model);
+		}
+	}
 }
 
 

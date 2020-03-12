@@ -103,9 +103,6 @@
     <None Include="Chunk_VS.glsl">
       <Filter>Ressourcendateien</Filter>
     </None>
-    <None Include="GenerateChunk_FS.glsl">
-      <Filter>Ressourcendateien</Filter>
-    </None>
     <None Include="GenerateChunk_CS.glsl">
       <Filter>Ressourcendateien</Filter>
     </None>

@@ -156,7 +156,6 @@
     <None Include="Debug_FS.glsl" />
     <None Include="Debug_VS.glsl" />
     <None Include="GenerateChunk_CS.glsl" />
-    <None Include="GenerateChunk_FS.glsl" />
     <None Include="ShadowMap_FS.glsl" />
     <None Include="Chunk_VS.glsl" />
     <None Include="SimpleDraw_FS.glsl" />

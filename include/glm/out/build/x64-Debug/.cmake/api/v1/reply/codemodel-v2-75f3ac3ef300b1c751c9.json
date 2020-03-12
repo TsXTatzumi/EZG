@@ -27,8 +27,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/simeo/source/repos/EZG/include/glm/out/build/x64-Debug",
-		"source" : "C:/Users/simeo/source/repos/EZG/include/glm"
+		"build" : "C:/Users/simeo/source/repos/TsXTatzumi/EZG/include/glm/out/build/x64-Debug",
+		"source" : "C:/Users/simeo/source/repos/TsXTatzumi/EZG/include/glm"
 	},
 	"version" : 
 	{

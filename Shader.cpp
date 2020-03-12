@@ -108,6 +108,9 @@ Shader::Shader(const char* computePath)
 	{
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
 	}
+
+	computeCode = &computeCode[3]; //glich hot-fix #########################################################
+
 	const char* cShaderCode = computeCode.c_str();
 
 	// 2. compile shaders

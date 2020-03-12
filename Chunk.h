@@ -14,18 +14,19 @@ public:
 	
 	glm::vec3 location;
 
-	static void Init(GLuint chunksize);
+	static void Init(GLuint chunksize, Shader* generateShader, Shader* renderShader);
 	
 	Chunk();
 	~Chunk();
 	
 	void setupData();
-	void render(const Shader* shader);
+	void render(glm::mat4 model);
 
 private:
 	static GLuint VAO, VBO;
 	static std::vector<glm::vec3> voxels;
 	static GLuint chunksize;
+	static Shader* generateShader, * renderShader;
 	
 	GLuint densityTex;
 };
