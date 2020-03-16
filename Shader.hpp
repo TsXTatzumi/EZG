@@ -12,8 +12,8 @@
 class Shader
 {
 public:
-	// the program ID
-	unsigned int ID;
+	// the program progHandle
+	unsigned int progHandle;
 
 	// constructor reads and builds the shader
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* geometryPath = nullptr);
@@ -23,13 +23,15 @@ public:
 	// utility uniform functions
 	void setBool(const std::string &name, bool value) const;
 	void setInt(const std::string &name, int value) const;
+	void setInts(const std::string& name, int* pointer, int size) const;
+	void getInts(const std::string& name, int* pointer, int size) const;
 	void setFloat(const std::string &name, float value) const;
 	void setMat4(const std::string &name, glm::mat4 & value) const;
 	void setVec3(const std::string &name, glm::vec3 & value) const;
 
 private:
 
-	void checkCompileErrors(GLuint shader, std::string type);
+	void checkCompileErrors(GLuint shader, std::string type = "PROGRAM");
 };
 
 #endif

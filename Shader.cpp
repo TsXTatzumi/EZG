@@ -42,11 +42,15 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 	{
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
 	}
+	
+	progHandle = glCreateProgram();
+	GLuint vertex, fragment, geometry;
+
+	
 	const char* vShaderCode = vertexCode.c_str();
 	const char* fShaderCode = fragmentCode.c_str();
 
 	// 2. compile shaders
-	unsigned int vertex, fragment, geometry;
 
 	// vertex Shader
 	vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -71,18 +75,23 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 	}
 	
 	// shader Program
-	ID = glCreateProgram();
-	glAttachShader(ID, vertex);
-	glAttachShader(ID, fragment);
+	glAttachShader(progHandle, vertex);
+	glAttachShader(progHandle, fragment);
 	if (geometryPath != nullptr)
-		glAttachShader(ID, geometry);
-	glLinkProgram(ID);
-	checkCompileErrors(ID, "PROGRAM");
+		glAttachShader(progHandle, geometry);
+	
+	glLinkProgram(progHandle);
+	checkCompileErrors(progHandle);
 	// delete the shaders as they're linked into our program now and no longer necessery
+	glDetachShader(progHandle, vertex);
+	glDetachShader(progHandle, fragment);
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
 	if (geometryPath != nullptr)
+	{
+		glDetachShader(progHandle, geometry);
 		glDeleteShader(geometry);
+	}
 }
 
 Shader::Shader(const char* computePath)
@@ -108,53 +117,60 @@ Shader::Shader(const char* computePath)
 	{
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
 	}
+	// Creating the compute shader, and the program object containing the shader
 
-	computeCode = &computeCode[3]; //glich hot-fix #########################################################
+	progHandle = glCreateProgram();
+	GLuint compute = glCreateShader(GL_COMPUTE_SHADER);
 
-	const char* cShaderCode = computeCode.c_str();
-
-	// 2. compile shaders
-	unsigned int compute;
-
-	// compute Shader
-	compute = glCreateShader(GL_COMPUTE_SHADER);
-	glShaderSource(compute, 1, &cShaderCode, NULL);
+	const char* computeSource = computeCode.c_str();
+	
+	glShaderSource(compute, 1, &computeSource, NULL);
 	glCompileShader(compute);
 	checkCompileErrors(compute, "COMPUTE");
+	
+	glAttachShader(progHandle, compute);
 
-	// shader Program
-	ID = glCreateProgram();
-	glAttachShader(ID, compute);
-	checkCompileErrors(ID, "PROGRAM");
+	glLinkProgram(progHandle);
+	checkCompileErrors(progHandle);
+	
 	// delete the shaders as they're linked into our program now and no longer necessery
+	glDetachShader(progHandle, compute);
 	glDeleteShader(compute);
 }
 
 void Shader::use()
 {
-	glUseProgram(ID);
+	glUseProgram(progHandle);
 }
 
 void Shader::setBool(const std::string &name, bool value) const
 {
-	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
+	glUniform1i(glGetUniformLocation(progHandle, name.c_str()), (int)value);
 }
 void Shader::setInt(const std::string &name, int value) const
 {
-	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+	glUniform1i(glGetUniformLocation(progHandle, name.c_str()), value);
+}
+void Shader::setInts(const std::string& name, int * pointer, int size) const
+{
+	glUniform1iv(glGetUniformLocation(progHandle, name.c_str()), size, pointer);
+}
+void Shader::getInts(const std::string& name, int* pointer, int size) const
+{
+	glGetnUniformiv(progHandle, glGetUniformLocation(progHandle, name.c_str()), size, pointer);
 }
 void Shader::setFloat(const std::string &name, float value) const
 {
-	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+	glUniform1f(glGetUniformLocation(progHandle, name.c_str()), value);
 }
 void Shader::setMat4(const std::string &name, glm::mat4 &value) const
 {
-	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(progHandle, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }
 
 void Shader::setVec3(const std::string &name, glm::vec3 &value) const
 {
-	glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+	glUniform3fv(glGetUniformLocation(progHandle, name.c_str()), 1, &value[0]);
 }
 
 // utility function for checking shader compilation/linking errors.
@@ -162,14 +178,16 @@ void Shader::setVec3(const std::string &name, glm::vec3 &value) const
 void Shader::checkCompileErrors(GLuint shader, std::string type)
 {
 	GLint success;
-	GLchar infoLog[1024];
 	if (type != "PROGRAM")
 	{
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 		if (!success)
 		{
-			glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-			std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+			fprintf(stderr, "Error in compiling the %s shader\n", type.c_str());
+			GLchar log[10240];
+			GLsizei length;
+			glGetShaderInfoLog(shader, 10239, &length, log);
+			fprintf(stderr, "Compiler log:\n%s\n", log);
 		}
 	}
 	else
@@ -177,8 +195,11 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
 		glGetProgramiv(shader, GL_LINK_STATUS, &success);
 		if (!success)
 		{
-			glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-			std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+			fprintf(stderr, "Error in linking the shader program\n");
+			GLchar log[10240];
+			GLsizei length;
+			glGetProgramInfoLog(shader, 10239, &length, log);
+			fprintf(stderr, "Linker log:\n%s\n", log);
 		}
 	}
 }

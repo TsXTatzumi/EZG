@@ -1,6 +1,1 @@
-﻿  Chunk.cpp
-C:\Users\simeo\Documents\Repos\TsXTatzumi\EZG\Chunk.cpp(17,21): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
-C:\Users\simeo\Documents\Repos\TsXTatzumi\EZG\Chunk.cpp(19,22): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
-C:\Users\simeo\Documents\Repos\TsXTatzumi\EZG\Chunk.cpp(21,23): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
-LINK : warning LNK4098: Standardbibliothek "MSVCRT" steht in Konflikt mit anderen Bibliotheken; /NODEFAULTLIB:Bibliothek verwenden.
-  EZG.vcxproj -> C:\Users\simeo\Documents\Repos\TsXTatzumi\EZG\Debug\EZG.exe
+﻿

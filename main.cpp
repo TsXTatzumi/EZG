@@ -25,7 +25,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 unsigned int loadTexture(const char *path);
-void renderScene(const Shader * shader, bool lightning);
+void renderScene();
 
 void renderQuad();
 
@@ -33,8 +33,8 @@ GLuint framebuffer;
 GLuint samples = 1;
 
 // settings
-unsigned int SCR_WIDTH = 1280;
-unsigned int SCR_HEIGHT = 720;
+unsigned int SCR_WIDTH = 720;
+unsigned int SCR_HEIGHT = 500;
 
 // camera
 Camera camera({0.0f, 0.0f, 3.0f } , {0.0f, 0.0f, 0.0f});
@@ -46,9 +46,9 @@ float speed = 3.0f;
 bool b_edit;
 
 // world
-const unsigned int chunksize = 16;
-const unsigned int num_chunks = 1;
-Chunk* chunks[num_chunks][num_chunks];
+const unsigned int chunksize = 32;
+const unsigned int num_chunks = 7;
+Chunk* chunks[num_chunks][1];
 
 float deltaTime, lastFrame;
 
@@ -86,7 +86,7 @@ int main()
 	// ------------------------------
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// glfw window creation
@@ -122,7 +122,7 @@ int main()
 	// build and compile shaders
 	// -------------------------
 	Shader * generateShader = new Shader("GenerateChunk_CS.glsl");
-	Shader * chunkShader = new Shader("Chunk_VS.glsl", "ShadowMap_FS.glsl");
+	Shader * chunkShader = new Shader("Chunk_VS.glsl", "Chunk_FS.glsl", "Chunk_GS.glsl");
 	//Shader * debugDepthQuad = new Shader("Debug_VS.glsl", "Debug_FS.glsl");
 
 	// shader configuration
@@ -131,14 +131,11 @@ int main()
 	setSamples();
 
 	// 
-	Chunk::Init(chunksize, generateShader, chunkShader);
+	Chunk::Init(chunksize, generateShader, chunkShader, 12345);
 	for (unsigned int x = 0; x < num_chunks; ++x)
 	{
-		for (unsigned int y = 0; y < num_chunks; ++y)
-		{
-			chunks[x][y] = new Chunk();
-			chunks[x][y]->setupData();
-		}
+			chunks[x][0] = new Chunk();
+			chunks[x][0]->setupData(x * chunksize, 0 * chunksize);
 	}
 
 	// render loop
@@ -150,10 +147,26 @@ int main()
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+		std::cout << camera.location.z << "\n";
+		glm::vec3 chunkPos = camera.location / glm::vec3(chunksize);
+		for (unsigned int x = 0; x < num_chunks; ++x)
+		{
+
+				glm::vec3 dist = chunks[x][0]->location - camera.location;
+				
+				if ( dist.x / chunksize > (-(int)num_chunks) / 2 + (int)num_chunks) 
+					chunks[x][0] ->relocate(chunks[x][0]->location.x - num_chunks * chunksize, chunks[x][0]->location.y);
+				
+				if (-dist.x / chunksize > (-(int)num_chunks) / 2 + (int)num_chunks) 
+					chunks[x][0]->relocate(chunks[x][0]->location.x + num_chunks * chunksize, chunks[x][0]->location.y);
+				
+		}
 
 		if (!b_edit)
 		{
-			// todo auto-move
+			camera.location.x += deltaTime *10;
+			camera.location.y = 50;
+			camera.location.z = 16;
 		}
 
 		// input
@@ -174,6 +187,11 @@ int main()
 		
 		glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 		glm::mat4 view = camera.GetViewMatrix();
+		
+		chunkShader->setMat4("projection", projection);
+		chunkShader->setMat4("view", view);
+
+		renderScene();
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -191,16 +209,13 @@ int main()
 
 // renders the 3D scene
 // --------------------
-void renderScene(const Shader * shader, bool lightning)
+void renderScene()
 {
 	glm::mat4 model = glm::mat4(1.0f);
 
 	for (unsigned int x = 0; x < num_chunks; ++x)
 	{
-		for (unsigned int y = 0; y < num_chunks; ++y)
-		{
-			chunks[x][y]->render(model);
-		}
+			chunks[x][0]->render(model);
 	}
 }
 
@@ -286,6 +301,12 @@ void processInput(GLFWwindow *window)
 		{
 			camera.roll = 0.0f;
 		}
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
+	{
+		Chunk::toggleWireframe();
+		while (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) glfwPollEvents();
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
