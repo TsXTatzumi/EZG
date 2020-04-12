@@ -1,31 +1,40 @@
 ﻿  Camera.cpp
   Chunk.cpp
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(17,20): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(18,21): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(37,21): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(39,22): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(41,23): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(19,28): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(21,21): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(22,22): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(46,21): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(48,22): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(50,23): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(53,38): warning C4267: "Argument": Konvertierung von "size_t" nach "_Ty", Datenverlust möglich
+          with
+          [
+              _Ty=GLuint
+          ]
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(85,45): warning C4305: "Argument": Verkürzung von "double" in "float"
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(86,47): warning C4305: "Argument": Verkürzung von "double" in "float"
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(216,62): warning C4267: "Argument": Konvertierung von "size_t" nach "GLsizei", Datenverlust möglich
   kdTree.cpp
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Chunk.cpp(119,42): warning C4267: "Argument": Konvertierung von "size_t" nach "GLsizei", Datenverlust möglich
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\kdTree.cpp(64,64): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\kdTree.cpp(209,46): warning C4267: "Argument": Konvertierung von "size_t" nach "GLsizei", Datenverlust möglich
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\kdTree.cpp(260,40): warning C4267: "Argument": Konvertierung von "size_t" nach "GLsizei", Datenverlust möglich
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\kdTree.cpp(503,13): warning C4244: "Initialisierung": Konvertierung von "__int64" in "int", möglicher Datenverlust
-  main.cpp
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\kdTree.cpp(534,15): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
+  main.cpp
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(41,13): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(42,13): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(150,22): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(321,17): warning C4305: "/=": Verkürzung von "double" in "float"
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(338,27): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(339,28): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(351,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(143,30): warning C4244: "Argument": Konvertierung von "unsigned int" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(152,22): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(342,17): warning C4305: "/=": Verkürzung von "double" in "float"
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(359,27): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(360,28): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(372,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(373,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
   Model.cpp
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\main.cpp(352,10): warning C4244: "=": Konvertierung von "double" in "float", möglicher Datenverlust
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Model.cpp(76,68): warning C4267: "Argument": Konvertierung von "size_t" nach "GLsizei", Datenverlust möglich
   Ray.cpp
   Shader.cpp
   Spline.cpp
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Model.cpp(76,68): warning C4267: "Argument": Konvertierung von "size_t" nach "GLsizei", Datenverlust möglich
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Spline.cpp(32,52): warning C4305: "Initialisierung": Verkürzung von "double" in "float"
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Spline.cpp(33,32): warning C4305: "+=": Verkürzung von "double" in "float"
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Spline.cpp(93,52): warning C4305: "Initialisierung": Verkürzung von "double" in "float"
@@ -35,10 +44,10 @@ E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Spline.cpp(144,89): warning C4267: "=": Ko
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Spline.cpp(153,111): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Spline.cpp(160,89): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
 E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Spline.cpp(264,88): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Spline.cpp(288,88): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
   Transform.cpp
   WorldObject.cpp
   Code wird generiert...
-E:\Dokumente\FH\Abgaben\repos\EZG\EZG\Spline.cpp(288,88): warning C4267: "=": Konvertierung von "size_t" nach "int", Datenverlust möglich
   glad.c
 main.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol "glfwInit" in Funktion "main".
 main.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol "glfwTerminate" in Funktion "main".
@@ -56,4 +65,4 @@ main.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol "glfwGe
 main.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol "glfwMakeContextCurrent" in Funktion "main".
 main.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol "glfwSwapBuffers" in Funktion "main".
 main.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol "glfwGetProcAddress" in Funktion "main".
-E:\Dokumente\FH\Abgaben\repos\EZG\x64\Debug\EZG.exe : fatal error LNK1120: 16 nicht aufgelöste Externe
+E:\Dokumente\FH\Abgaben\repos\EZG\EZG\x64\Debug\EZG.exe : fatal error LNK1120: 16 nicht aufgelöste Externe

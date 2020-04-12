@@ -1,5 +1,6 @@
 #version 430
 layout(local_size_x = 11, local_size_y = 11, local_size_z = 3) in;
+layout(binding = 0, r16f) uniform writeonly image3D tex3D;
 
 
 #define TETRAHEDRA_TO_CUBES  0.33333333333  // 1 / 3
@@ -46,7 +47,10 @@ vec3[32] gradients3D = vec3[](
 #define SIMPLEX_SCALE_3D 40.78957241 // 8192f * sqrt(3) / 375 / 0.9276201
 
 #define MASK 255
-uniform uint[256] hash;
+layout(std430, binding = 0) readonly buffer seedling_data
+{
+	int[256] hash;
+};
 
 struct Noise3D
 {
@@ -166,28 +170,25 @@ Noise3D Fractal(vec3 position)
 		sum.value += noise.value * current_amplitude;
 		sum.derivative += noise.derivative * current_amplitude;
 	}
-	
+
 	sum.value *= amplitude / range;
 	sum.derivative *= amplitude / range;
-	
+
 	return sum;
 }
 
 uniform int size;
 uniform vec3 chunk_position;
 
-layout(std430, binding = 0) writeonly buffer volume_data
-{
-	float[] volume;
-};
-
 void main()
 {
-	ivec3 voxel_position = ivec3(gl_GlobalInvocationID.xyz) + ivec3(chunk_position);
+	ivec3 inChunk_position = ivec3(gl_GlobalInvocationID);
 
-	float value = Fractal(voxel_position).value;
+	ivec3 texel_position = ivec3((inChunk_position.x + chunk_position.x), (inChunk_position.y + chunk_position.y), (inChunk_position.z + chunk_position.z));
 
-	float r = (voxel_position - size / 2).y * (voxel_position - size / 2).y + (voxel_position - size / 2).z * (voxel_position - size / 2).z;
+	float value = Fractal(texel_position).value + 1;
 
-	volume[(voxel_position.x * size + voxel_position.y) * size + voxel_position.z] = value - r/256;
+	float r = sqrt((texel_position - size / 2).y * (texel_position - size / 2).y + (texel_position - size / 2).z * (texel_position - size / 2).z);
+
+	imageStore(tex3D, inChunk_position, vec4(value/2 - r/size/2, 0, 0, 1));
 }

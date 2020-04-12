@@ -41,14 +41,17 @@ Camera camera({0.0f, 0.0f, 3.0f } , {0.0f, 0.0f, 0.0f});
 float lastX = (float)SCR_WIDTH / 2.0;
 float lastY = (float)SCR_HEIGHT / 2.0;
 bool firstMouse = true;
-float speed = 3.0f;
+float speed = 0.5;
 
-bool b_edit;
+bool b_edit = true;
 
 // world
 const unsigned int chunksize = 32;
 const unsigned int num_chunks = 7;
 Chunk* chunks[num_chunks][1];
+
+int steps = 16;
+int finesteps = 32;
 
 float deltaTime, lastFrame;
 
@@ -118,20 +121,30 @@ int main()
 	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_DEBUG_OUTPUT);
 
 	// build and compile shaders
 	// -------------------------
 	Shader * generateShader = new Shader("GenerateChunk_CS.glsl");
-	Shader * chunkShader = new Shader("Chunk_VS.glsl", "Chunk_FS.glsl", "Chunk_GS.glsl");
+	Shader* chunkShader = new Shader("Chunk_VS.glsl", "Chunk_FS.glsl" , "Chunk_GS.glsl");
 	//Shader * debugDepthQuad = new Shader("Debug_VS.glsl", "Debug_FS.glsl");
 
+	chunkShader->use();
+
+	chunkShader->setInt("steps", steps);
+	chunkShader->setInt("fine_steps", finesteps);
+	
 	// shader configuration
 	// --------------------
 
 	setSamples();
 
-	// 
-	Chunk::Init(chunksize, generateShader, chunkShader, 12345);
+	//
+	GLuint Xtex = loadTexture("Z.jpg");
+	GLuint Ytex = loadTexture("Y.jpg");
+	GLuint Ztex = loadTexture("Z.jpg");
+	
+	Chunk::Init(chunksize, generateShader, chunkShader, 12345, Xtex, Ytex, Ztex);
 	for (unsigned int x = 0; x < num_chunks; ++x)
 	{
 			chunks[x][0] = new Chunk();
@@ -147,7 +160,7 @@ int main()
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		std::cout << camera.location.z << "\n";
+
 		glm::vec3 chunkPos = camera.location / glm::vec3(chunksize);
 		for (unsigned int x = 0; x < num_chunks; ++x)
 		{
@@ -164,7 +177,7 @@ int main()
 
 		if (!b_edit)
 		{
-			camera.location.x += deltaTime *10;
+			camera.location.x += deltaTime * speed;
 			camera.location.y = 50;
 			camera.location.z = 16;
 		}
@@ -190,13 +203,14 @@ int main()
 		
 		chunkShader->setMat4("projection", projection);
 		chunkShader->setMat4("view", view);
+		chunkShader->setVec3("camera_position", camera.location);
 
 		renderScene();
-
+		
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-		
+
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
 		glfwSwapBuffers(window);
@@ -309,7 +323,46 @@ void processInput(GLFWwindow *window)
 		while (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) glfwPollEvents();
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+	{
+		if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		{
+			if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
+			{
+				finesteps++;
+				Chunk::setSteps(steps, finesteps);
+				
+				while (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS) glfwPollEvents();
+			}
+
+			if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
+			{
+				finesteps = glm::max(0, finesteps - 1);
+				Chunk::setSteps(steps, finesteps);
+				
+				while (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS) glfwPollEvents();
+			}
+		}
+		else
+		{
+			if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
+			{
+				steps++;
+				Chunk::setSteps(steps, finesteps);
+
+				while (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS) glfwPollEvents();
+			}
+
+			if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
+			{
+				steps = glm::max(0, steps - 1);
+				Chunk::setSteps(steps, finesteps);
+
+				while (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS) glfwPollEvents();
+			}
+		}
+	}
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 	{
 		if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
 		{

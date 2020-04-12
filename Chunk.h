@@ -16,8 +16,9 @@ public:
 
 	void asdf();
 
-	static void Init(GLuint chunksize, Shader* generateShader, Shader* renderShader, int seed);
+	static void Init(GLuint chunksize, Shader* generateShader, Shader* renderShader, int seed, GLuint Xtex, GLuint Ytex, GLuint Ztex);
 	static void toggleWireframe();
+	static void setSteps(int steps, int finesteps);
 	
 	Chunk();
 	~Chunk();
@@ -27,14 +28,13 @@ public:
 	void render(glm::mat4 model);
 	
 private:
-	static GLuint VAO, VBO, EBO, faceCount_SSBO, edgeList_SSBO;
+	static GLuint VAO, VBO, EBO, faceCount_SSBO, edgeList_SSBO, seedling_UBO, Xtex, Ytex, Ztex;
 	static std::vector<glm::vec3> voxels;
 	static std::vector<GLuint> indices;
 	static GLuint chunksize;
 	static Shader* generateShader, * renderShader;
 	static bool isSolid;
 	
-	float * volume;
-	GLuint  volume_SSBO;
+	GLuint densityTex;
 };
 
