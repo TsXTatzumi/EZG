@@ -76,7 +76,6 @@ out vec3 world_position;
 out vec3 v1;
 out vec3 v2;
 out vec3 v3;
-out vec3 barycentric;
 
 float makeTea(uint edgeID)
 {
@@ -119,11 +118,8 @@ void main()
 		v2 = (model * vec4(orgin[0] + startCorner[edges.y] + makeTea(edges.y) * edgeDir[edges.y], 1.0)).xyz;
 		v3 = (model * vec4(orgin[0] + startCorner[edges.z] + makeTea(edges.z) * edgeDir[edges.z], 1.0)).xyz;
 
-		barycentric = vec3(1, 0, 0);
 		PlaceVertOnEdge(edges.x);
-		barycentric = vec3(0, 1, 0);
 		PlaceVertOnEdge(edges.y);
-		barycentric = vec3(0, 0, 1);
 		PlaceVertOnEdge(edges.z);
 
 		EndPrimitive();
