@@ -132,6 +132,7 @@
     <ClCompile Include="kdTree.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ParticleSpawn.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Spline.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="MarchTables.hpp" />
     <ClInclude Include="MathDefines.h" />
     <ClInclude Include="Model.hpp" />
+    <ClInclude Include="ParticleSpawn.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Shader.hpp" />
     <ClInclude Include="Spline.hpp" />
@@ -154,12 +156,16 @@
     <ClInclude Include="WorldObject.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ChunkRay_CS.glsl" />
     <None Include="Chunk_GS.glsl" />
     <None Include="Debug_FS.glsl" />
     <None Include="Debug_VS.glsl" />
     <None Include="Chunk_FS.glsl" />
     <None Include="Chunk_VS.glsl" />
     <None Include="generateChunk_CS.glsl" />
+    <None Include="Particle_GS.glsl" />
+    <None Include="Particle_FS.glsl" />
+    <None Include="Particle_VS.glsl" />
     <None Include="SimpleDraw_FS.glsl" />
     <None Include="SimpleDraw_VS.glsl" />
   </ItemGroup>

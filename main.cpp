@@ -18,10 +18,12 @@
 #include "kdTree.h"
 #include "Spline.hpp"
 #include "Chunk.h"
+#include "ParticleSpawn.h"
 
 void setSamples();
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 unsigned int loadTexture(const char *path);
@@ -49,6 +51,10 @@ bool b_edit = true;
 const unsigned int chunksize = 32;
 const unsigned int num_chunks = 7;
 Chunk* chunks[num_chunks][1];
+
+std::vector<ParticleSpawn*> particleSpawns;
+float particle_update_time = 0;
+int particle_update_rate = 20;
 
 int steps = 16;
 int finesteps = 32;
@@ -83,6 +89,8 @@ void setSamples()
 }
 
 
+Shader* particleShader;
+
 int main()
 {
 	// glfw: initialize and configure
@@ -104,6 +112,7 @@ int main()
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
 	// tell GLFW to capture our mouse
@@ -127,6 +136,10 @@ int main()
 	// -------------------------
 	Shader * generateShader = new Shader("GenerateChunk_CS.glsl");
 	Shader* chunkShader = new Shader("Chunk_VS.glsl", "Chunk_FS.glsl" , "Chunk_GS.glsl");
+	Shader* rayShader = new Shader("ChunkRay_CS.glsl");
+
+	particleShader = new Shader("Particle_VS.glsl", "Particle_FS.glsl", "Particle_GS.glsl");
+	
 	//Shader * debugDepthQuad = new Shader("Debug_VS.glsl", "Debug_FS.glsl");
 
 	chunkShader->use();
@@ -144,7 +157,7 @@ int main()
 	GLuint Ytex = loadTexture("Y.jpg");
 	GLuint Ztex = loadTexture("Z.jpg");
 	
-	Chunk::Init(chunksize, generateShader, chunkShader, 12345, Xtex, Ytex, Ztex);
+	Chunk::Init(chunksize, generateShader, chunkShader, rayShader, 12345, Xtex, Ytex, Ztex);
 	for (unsigned int x = 0; x < num_chunks; ++x)
 	{
 			chunks[x][0] = new Chunk();
@@ -175,12 +188,33 @@ int main()
 				
 		}
 
-		if (!b_edit)
+		particle_update_time += deltaTime;
+		if (particle_update_time > 1.0f / particle_update_rate)
+		{
+			for (std::vector<ParticleSpawn*>::iterator particleSpawn = particleSpawns.begin(); particleSpawn != particleSpawns.end(); )
+			{
+				int offset = particleSpawn - particleSpawns.begin();
+				if ((*particleSpawn)->Dead()) {
+					particleSpawns.erase(particleSpawn);
+					particleSpawn = particleSpawns.begin() + offset;
+				}
+				else
+				{
+					(*particleSpawn)->Update(particle_update_time);
+					particleSpawn++;
+				}
+			}
+			
+			particle_update_time = 0;
+		}
+
+		
+		/*if (!b_edit)
 		{
 			camera.location.x += deltaTime * speed;
 			camera.location.y = 50;
 			camera.location.z = 16;
-		}
+		}*/
 
 		// input
 		// -----
@@ -200,11 +234,18 @@ int main()
 		
 		glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 		glm::mat4 view = camera.GetViewMatrix();
+
+		chunkShader->use();
 		
 		chunkShader->setMat4("projection", projection);
 		chunkShader->setMat4("view", view);
 		chunkShader->setVec3("camera_position", camera.location);
 
+		particleShader->use();
+
+		particleShader->setMat4("projection", projection);
+		particleShader->setMat4("view", view);
+		
 		renderScene();
 		
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
@@ -230,6 +271,11 @@ void renderScene()
 	for (unsigned int x = 0; x < num_chunks; ++x)
 	{
 			chunks[x][0]->render(model);
+	}
+
+	for (std::vector<ParticleSpawn*>::value_type particle_spawn : particleSpawns)
+	{
+		particle_spawn->Draw();
 	}
 }
 
@@ -276,7 +322,15 @@ void processInput(GLFWwindow *window)
 {
 	if (glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS)
 	{
-		b_edit = !b_edit;
+		if ((b_edit = !b_edit)) {
+			glfwSetCursorPosCallback(window, mouse_callback);
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		}
+		else {
+			glfwSetCursorPosCallback(window, nullptr);
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+		
 		while (glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS) glfwPollEvents();
 	}
 	
@@ -378,6 +432,20 @@ void processInput(GLFWwindow *window)
 			while (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS) glfwPollEvents();
 		}
 	}
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	{
+		if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
+		{
+			particle_update_rate++;
+			while (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS) glfwPollEvents();
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
+		{
+			particle_update_rate = glm::max(--particle_update_rate, 1);
+			while (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS) glfwPollEvents();
+		}
+	}
 	else
 	{
 		if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
@@ -419,6 +487,33 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	camera.rotation = glm::quat({ 0, (lastX - xpos) * 0.004f, 0 }) * camera.rotation;
 	lastX = xpos;
 	lastY = ypos;
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	double xpos, ypos;
+	//getting cursor position
+	glfwGetCursorPos(window, &xpos, &ypos);
+	
+	glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+	glm::mat4 view = camera.GetViewMatrix();
+
+	glm::vec2 normaizedMouse = glm::vec2(xpos / SCR_WIDTH * 2 - 1, -(ypos / SCR_HEIGHT * 2 - 1));
+	glm::vec4 clipCoords = glm::vec4(normaizedMouse, -1, 1);
+	glm::vec4 eyeCoords = glm::vec4((inverse(projection) * clipCoords).x, (inverse(projection) * clipCoords).y, -1, 0);
+	glm::vec3 worldDir = glm::vec3(glm::inverse(view) * eyeCoords);
+	
+	Ray ray(camera.location, camera.location + worldDir);
+	
+	glm::vec3 pos, norm;
+	for (unsigned int x = 0; x < num_chunks; ++x)
+	{
+		if(chunks[x][0]->ray(ray, pos, norm))
+		{
+			std::cout << "Hit!\n";
+			particleSpawns.push_back(new ParticleSpawn(particleShader, pos, norm, 60.0f));
+		}
+	}
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called

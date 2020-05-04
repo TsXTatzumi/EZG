@@ -298,4 +298,34 @@ const int EDGE_CONNECT_LIST[] = {
 	-1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1,  -1, -1, -1, -1
 };
 
+const glm::vec3 startCorner[] = {
+	glm::vec3(0, 0, 0),
+	glm::vec3(0, 1, 0),
+	glm::vec3(1, 0, 0),
+	glm::vec3(0, 0, 0),
+	glm::vec3(0, 0, 1),
+	glm::vec3(0, 1, 1),
+	glm::vec3(1, 0, 1),
+	glm::vec3(0, 0, 1),
+	glm::vec3(0, 0, 0),
+	glm::vec3(0, 1, 0),
+	glm::vec3(1, 1, 0),
+	glm::vec3(1, 0, 0)
+};
+
+const glm::vec3 edgeDir[] = {
+	glm::vec3(0, 1, 0),
+	glm::vec3(1, 0, 0),
+	glm::vec3(0, 1, 0),
+	glm::vec3(1, 0, 0),
+	glm::vec3(0, 1, 0),
+	glm::vec3(1, 0, 0),
+	glm::vec3(0, 1, 0),
+	glm::vec3(1, 0, 0),
+	glm::vec3(0, 0, 1),
+	glm::vec3(0, 0, 1),
+	glm::vec3(0, 0, 1),
+	glm::vec3(0, 0, 1)
+};
+
 
