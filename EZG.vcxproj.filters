@@ -130,5 +130,8 @@
     <None Include="Particle_GS.glsl">
       <Filter>Ressourcendateien</Filter>
     </None>
+    <None Include="Particle_CS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
   </ItemGroup>
 </Project>

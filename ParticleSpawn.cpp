@@ -1,8 +1,10 @@
 #include "ParticleSpawn.h"
 
+#include <functional>
 
-ParticleSpawn::ParticleSpawn(Shader* shader, glm::vec3 location, glm::vec3 direction, float lifetime, unsigned amount)
-    : shader(shader), location(location), direction(direction), amount(amount), lifetime(lifetime)
+
+ParticleSpawn::ParticleSpawn(Shader* shader, glm::vec3 location, glm::vec3 direction, float lifetime, unsigned amount, Shader * updateShader)
+    : shader(shader), location(location), direction(direction), amount(amount), lifetime(lifetime), updateShader(updateShader)
 {
     this->init();
 }
@@ -21,48 +23,83 @@ void ParticleSpawn::Update(float dt)
             this->respawnParticle(this->particles[unusedParticle], 0, location + glm::vec3(sin(rand()), sin(rand()), sin(rand())) * 0.1f);
         }
 	}
-	
-    // update all particles
-    for (unsigned int i = 0; i < this->amount; ++i)
+
+    if (updateShader == nullptr)
     {
-        Particle& p = this->particles[i];
-        p.Life -= dt; // reduce life
-        if (p.Life <= 0.0f && p.Type == 0) respawnParticle(p, 1, p.Position);
-        if (p.Life > 0.0f)
-        {	// particle is alive, thus update
-            if(p.Type == 0)
-            {
-                p.Velocity += direction * dt * 5.0f;
-                p.Color = (rand() < RAND_MAX / 16) ? glm::vec4(1.0, 0.85 , 0, 1) : glm::vec4(0.1, 0.1, 0.1, 1);
-            	if(rand() < RAND_MAX / 8)
+        // update all particles
+        for (unsigned int i = 0; i < this->amount; ++i)
+        {
+            Particle& p = this->particles[i];
+            p.Life -= dt; // reduce life
+            if (p.Life <= 0.0f && p.Type == 0) respawnParticle(p, 1, p.Position);
+            if (p.Life > 0.0f)
+            {	// particle is alive, thus update
+                if (p.Type == 0)
                 {
-                    int unusedParticle = this->firstUnusedParticle();
-                    this->respawnParticle(this->particles[unusedParticle], 2, p.Position);
+                    p.Velocity += glm::vec4(direction * dt * 5.0f, 0);
+                    p.Color = (rand() < RAND_MAX / 16) ? glm::vec4(1.0, 0.85, 0, 1) : glm::vec4(0.1, 0.1, 0.1, 1);
+                    if (rand() < RAND_MAX / 8)
+                    {
+                        int unusedParticle = this->firstUnusedParticle();
+                        this->respawnParticle(this->particles[unusedParticle], 2, p.Position);
+                    }
                 }
-            }
-            else if (p.Type == 1)
-            {
-                p.Velocity *= 0.985;
-                if (rand() < RAND_MAX / 16)
+                else if (p.Type == 1)
                 {
-                    p.Life -= dt;
+                    p.Velocity *= 0.985;
+                    if (rand() < RAND_MAX / 16)
+                    {
+                        p.Life -= dt;
+                    }
                 }
-            }
-            else if (p.Type == 2)
-            {
-                p.Velocity += glm::vec3(sin(rand()), sin(rand()), sin(rand())) * dt * 4.5f;
-                p.Color.a -= dt * 2;
-                if (rand() < RAND_MAX / 8)
+                else if (p.Type == 2)
                 {
-                    p.Color.r += 4 * dt;
-                    p.Color.g += 4 * dt;
-                    p.Color.b += 4 * dt;
-                    p.Life -= dt;
+                    p.Velocity += glm::vec4(sin(rand()), sin(rand()), sin(rand()), 0) * dt * 4.5f;
+                    p.Color.a -= dt * 2;
+                    if (rand() < RAND_MAX / 8)
+                    {
+                        p.Color.r += 4 * dt;
+                        p.Color.g += 4 * dt;
+                        p.Color.b += 4 * dt;
+                        p.Life -= dt;
+                    }
                 }
+
+                p.Position += p.Velocity * dt;
             }
-        	
-            p.Position += p.Velocity * dt;
         }
+    }
+    else
+    {
+        updateShader->use();
+
+        updateShader->setFloat("dt", dt);
+        updateShader->setVec3("direction", direction);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, particles_SSBO);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, amount * sizeof(Particle), &(particles[0]), GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, particles_SSBO);
+
+        glDispatchCompute(1, 1, 1);
+
+        // make sure writing to image has finished before read
+        glMemoryBarrier(GL_ALL_BARRIER_BITS);
+    	
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, particles_SSBO);
+    	
+        Particle* ptr;
+        ptr = (Particle*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
+
+        for (int i = 0; i < amount; i++)
+        {
+            particles[i] = ptr[i];
+        }
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 }
 
@@ -115,6 +152,8 @@ void ParticleSpawn::init()
     glEnableVertexAttribArray(5);
     glVertexAttribPointer(5, 1, GL_INT, GL_FALSE, sizeof(Particle), (void*)offsetof(Particle, Seed));
     glBindVertexArray(0);
+
+    glGenBuffers(1, &particles_SSBO);
 }
 
 // stores the index of the last particle used (for quick access to next dead particle)
@@ -142,24 +181,24 @@ unsigned int ParticleSpawn::firstUnusedParticle()
 
 void ParticleSpawn::respawnParticle(Particle& particle, int type, glm::vec3 position)
 {
-	particle.Position = position;
+	particle.Position = glm::vec4(position, 1);
     particle.Seed = rand();
 	particle.Type = type;
 	if(type == 0)
 	{
 	    particle.Life = 3.0;
-		particle.Velocity = direction;
+		particle.Velocity = glm::vec4(direction, 0);
 	}
     else if (type == 1) 
     {
         particle.Life = 0.7;
         particle.Color = glm::vec4(1.0, 0.85, 0.0, 1.0);
-        particle.Velocity = normalize(glm::vec3(sin(rand()), sin(rand()), sin(rand()))) * 8.0f;
+        particle.Velocity = glm::vec4(normalize(glm::vec3(sin(rand()), sin(rand()), sin(rand()))) * 8.0f, 0);
     }
     else if(type == 2)
     {
         particle.Life = 0.5f;
         particle.Color = glm::vec4(0, 0, 0, 1);
-        particle.Velocity = direction;
+        particle.Velocity = glm::vec4(direction, 0);
     }
 }

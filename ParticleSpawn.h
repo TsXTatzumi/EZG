@@ -6,7 +6,7 @@
 
 // Represents a single particle and its state
 struct Particle {
-    glm::vec3 Position, Velocity;
+    glm::vec4 Position, Velocity;
     glm::vec4 Color;
     float     Life;
     int       Type, Seed;
@@ -22,7 +22,7 @@ class ParticleSpawn
 {
 public:
     // constructor
-    ParticleSpawn(Shader* shader, glm::vec3 location, glm::vec3 direction, float lifetime, unsigned amount = 300);
+    ParticleSpawn(Shader* shader, glm::vec3 location, glm::vec3 direction, float lifetime, unsigned amount = 300, Shader* updateShader = nullptr);
     // update all particles
     void Update(float dt);
     // render all particles
@@ -39,8 +39,10 @@ private:
     float lifetime;
     // render state
     Shader* shader;
+    Shader* updateShader = nullptr;
 
     unsigned int VAO, VBO;
+    GLuint particles_SSBO;
     // initializes buffer and vertex attributes
     void init();
     // returns the first Particle index that's currently unused e.g. Life <= 0.0f or 0 if no particle is currently inactive

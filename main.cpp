@@ -90,6 +90,7 @@ void setSamples()
 
 
 Shader* particleShader;
+Shader* particleUShader;
 
 int main()
 {
@@ -139,6 +140,7 @@ int main()
 	Shader* rayShader = new Shader("ChunkRay_CS.glsl");
 
 	particleShader = new Shader("Particle_VS.glsl", "Particle_FS.glsl", "Particle_GS.glsl");
+	particleUShader = new Shader("Particle_CS.glsl");
 	
 	//Shader * debugDepthQuad = new Shader("Debug_VS.glsl", "Debug_FS.glsl");
 
@@ -511,7 +513,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		if(chunks[x][0]->ray(ray, pos, norm))
 		{
 			std::cout << "Hit!\n";
-			particleSpawns.push_back(new ParticleSpawn(particleShader, pos, norm, 60.0f));
+			particleSpawns.push_back(new ParticleSpawn(particleShader, pos, norm, 60.0f, 300, particleUShader));
 		}
 	}
 }

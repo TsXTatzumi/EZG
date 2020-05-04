@@ -163,6 +163,7 @@
     <None Include="Chunk_FS.glsl" />
     <None Include="Chunk_VS.glsl" />
     <None Include="generateChunk_CS.glsl" />
+    <None Include="Particle_CS.glsl" />
     <None Include="Particle_GS.glsl" />
     <None Include="Particle_FS.glsl" />
     <None Include="Particle_VS.glsl" />
