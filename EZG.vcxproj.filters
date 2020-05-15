@@ -133,5 +133,28 @@
     <None Include="Particle_CS.glsl">
       <Filter>Ressourcendateien</Filter>
     </None>
+    <None Include="Depth_VS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="Empty_FS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="ShadowMap_FS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="ShadowMap_VS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="Blur_CS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="container.jpg">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="normal.png">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
   </ItemGroup>
 </Project>

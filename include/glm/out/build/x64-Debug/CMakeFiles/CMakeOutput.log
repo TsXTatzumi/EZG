@@ -6,11 +6,11 @@ Id flags:
 
 The output was:
 0
-Microsoft (R) C/C++-Optimierungscompiler Version 19.25.28610.4 für x64
+Microsoft (R) C/C++-Optimierungscompiler Version 19.25.28614 für x64
 Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
 
 CMakeCCompilerId.c
-Microsoft (R) Incremental Linker Version 14.25.28610.4
+Microsoft (R) Incremental Linker Version 14.25.28614.0
 Copyright (C) Microsoft Corporation.  All rights reserved.
 
 /out:CMakeCCompilerId.exe 
@@ -30,11 +30,11 @@ Id flags:
 
 The output was:
 0
-Microsoft (R) C/C++-Optimierungscompiler Version 19.25.28610.4 für x64
+Microsoft (R) C/C++-Optimierungscompiler Version 19.25.28614 für x64
 Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
 
 CMakeCXXCompilerId.cpp
-Microsoft (R) Incremental Linker Version 14.25.28610.4
+Microsoft (R) Incremental Linker Version 14.25.28614.0
 Copyright (C) Microsoft Corporation.  All rights reserved.
 
 /out:CMakeCXXCompilerId.exe 

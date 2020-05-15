@@ -156,19 +156,28 @@
     <ClInclude Include="WorldObject.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Blur_CS.glsl" />
     <None Include="ChunkRay_CS.glsl" />
     <None Include="Chunk_GS.glsl" />
     <None Include="Debug_FS.glsl" />
     <None Include="Debug_VS.glsl" />
     <None Include="Chunk_FS.glsl" />
     <None Include="Chunk_VS.glsl" />
+    <None Include="Depth_VS.glsl" />
+    <None Include="Empty_FS.glsl" />
     <None Include="generateChunk_CS.glsl" />
     <None Include="Particle_CS.glsl" />
     <None Include="Particle_GS.glsl" />
     <None Include="Particle_FS.glsl" />
     <None Include="Particle_VS.glsl" />
+    <None Include="ShadowMap_FS.glsl" />
+    <None Include="ShadowMap_VS.glsl" />
     <None Include="SimpleDraw_FS.glsl" />
     <None Include="SimpleDraw_VS.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="container.jpg" />
+    <Image Include="normal.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
