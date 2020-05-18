@@ -3,8 +3,6 @@ layout(local_size_x = 1, local_size_y = 1024, local_size_z = 1) in;
 uniform sampler2D from;
 layout(r16f) uniform image2D to;
 
-uniform int dim;
-
 uniform float[7] weights = {
     0.00598,
     0.060626,

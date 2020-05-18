@@ -438,8 +438,6 @@ int main()
 		// blur S/
 		blurShader->use();
 
-		blurShader->setInt("dim", 0);
-
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
 		glBindImageTexture(0, shadowMap, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R16F);
