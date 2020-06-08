@@ -528,12 +528,12 @@ int main()
 		}
 
 		
-		/*if (!b_edit)
+		if (!b_edit)
 		{
-			camera.location.x += deltaTime * speed;
-			camera.location.y = 50;
+			camera.location.x += deltaTime * speed * 4;
+			camera.location.y = 30;
 			camera.location.z = 16;
-		}*/
+		}
 
 		// input
 		// -----
