@@ -112,9 +112,6 @@
     <None Include="Chunk_GS.glsl">
       <Filter>Ressourcendateien</Filter>
     </None>
-    <None Include="Chunk_FS.glsl">
-      <Filter>Ressourcendateien</Filter>
-    </None>
     <None Include="generateChunk_CS.glsl">
       <Filter>Ressourcendateien</Filter>
     </None>
@@ -146,6 +143,21 @@
       <Filter>Ressourcendateien</Filter>
     </None>
     <None Include="Blur_CS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="Chunk_FS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="SSAO_VS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="SSAOBlur_FS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="SSAO_FS.glsl">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="SSAORender_FS.glsl">
       <Filter>Ressourcendateien</Filter>
     </None>
   </ItemGroup>

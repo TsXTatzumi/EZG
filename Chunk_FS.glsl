@@ -1,18 +1,23 @@
 #version 430 core
 
 in vec3 world_normal;
+in vec3 view_normal;
 in vec3 normal;
 in vec3 world_position;
+in vec3 view_position;
 in vec3 v1;
 in vec3 v2;
 in vec3 v3;
 
 
-out vec4 FragColor;
+layout (location = 0) out vec3 gPosition;
+layout (location = 1) out vec3 gNormal;
+layout (location = 2) out vec3 gAlbedo;
 
 uniform sampler2D X;
 uniform sampler2D Y;
 uniform sampler2D Z;
+uniform sampler2D ssao;
 
 uniform vec3 camera_position;
 uniform int steps;
@@ -94,6 +99,11 @@ void main()
 	vec3 barycentric = calcBarycentric(UVW);
 	if (wireframe && barycentric.x > 0.02 && barycentric.y > 0.02 && barycentric.z > 0.02) discard;
 	if (barycentric.x < -0.0 || barycentric.y < -0.0 || barycentric.z < -0.0) discard;
-	
-	FragColor = vec4(color, 1.0);
+		 
+	// store the fragment position vector in the first gbuffer texture
+    gPosition = view_position;
+    // also store the per-fragment normals into the gbuffer
+    gNormal = normalize(view_normal);
+    // and the diffuse per-fragment color
+    gAlbedo.rgb = color;
 }

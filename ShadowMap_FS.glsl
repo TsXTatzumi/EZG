@@ -1,5 +1,13 @@
 #version 330 core
-out vec4 FragColor;
+
+
+layout (location = 0) out vec3 gPosition;
+layout (location = 1) out vec3 gNormal;
+layout (location = 2) out vec3 gAlbedo;
+
+
+in vec3 view_normal;
+in vec3 view_position;
 
 in VS_OUT{
 	vec3 FragPos;
@@ -62,6 +70,11 @@ void main()
 	// calculate shadow
 	float shadow = ShadowCalculation();
 	vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
-
-	FragColor = vec4(lighting, 1.0);
+		 
+	// store the fragment position vector in the first gbuffer texture
+    gPosition = view_position;
+    // also store the per-fragment normals into the gbuffer
+    gNormal = normalize(view_normal);
+    // and the diffuse per-fragment color
+    gAlbedo.rgb = lighting;
 }

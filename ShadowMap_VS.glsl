@@ -6,6 +6,9 @@ layout (location = 3) in vec3 aTangent;
 
 out vec2 TexCoords;
 
+out vec3 view_normal;
+out vec3 view_position;
+
 out VS_OUT {
     vec3 FragPos;
 	mat3 TBN;
@@ -37,5 +40,9 @@ void main()
 
 	vs_out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
 
-	gl_Position = projection * view * model * vec4(aPos, 1.0);
+	view_normal = (transpose(inverse(view * model)) * vec4(aNormal, 1.0)).xyz;
+
+    view_position = (view * model * vec4(aPos, 1.0)).xyz;
+
+	gl_Position = projection * vec4(view_position, 1.0);
 }

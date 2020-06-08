@@ -202,17 +202,18 @@ void Chunk::relocate(float x, float y)
 	
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, 0);
 }
-
 void Chunk::render(glm::mat4 model)
 {
 	model = glm::translate(model, location);
 
+	
 	renderShader->use();
 
 	renderShader->setMat4("model", model);
 	renderShader->setInt("X", 0);
 	renderShader->setInt("Y", 1);
 	renderShader->setInt("Z", 2);
+	renderShader->setInt("ssao", 3);
 	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Xtex);

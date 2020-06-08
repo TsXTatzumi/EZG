@@ -158,10 +158,12 @@
   <ItemGroup>
     <None Include="Blur_CS.glsl" />
     <None Include="ChunkRay_CS.glsl" />
+    <None Include="Chunk_FS.glsl" />
     <None Include="Chunk_GS.glsl" />
     <None Include="Debug_FS.glsl" />
     <None Include="Debug_VS.glsl" />
-    <None Include="Chunk_FS.glsl" />
+    <None Include="SSAOBlur_FS.glsl" />
+    <None Include="SSAORender_FS.glsl" />
     <None Include="Chunk_VS.glsl" />
     <None Include="Depth_VS.glsl" />
     <None Include="Empty_FS.glsl" />
@@ -174,6 +176,8 @@
     <None Include="ShadowMap_VS.glsl" />
     <None Include="SimpleDraw_FS.glsl" />
     <None Include="SimpleDraw_VS.glsl" />
+    <None Include="SSAO_FS.glsl" />
+    <None Include="SSAO_VS.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="container.jpg" />

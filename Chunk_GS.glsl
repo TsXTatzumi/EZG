@@ -71,8 +71,10 @@ vec3 edgeDir[] = {
 };
 
 out vec3 world_normal;
+out vec3 view_normal;
 out vec3 normal;
 out vec3 world_position;
+out vec3 view_position;
 out vec3 v1;
 out vec3 v2;
 out vec3 v3;
@@ -88,8 +90,10 @@ void PlaceVertOnEdge(uint edgeID)
 	float t = makeTea(edgeID);
 
 	world_position = (model * vec4(orgin[0] + startCorner[edgeID] + t * edgeDir[edgeID], 1.0)).xyz;
-	gl_Position = projection * view * model * vec4(orgin[0] + startCorner[edgeID] + t * edgeDir[edgeID], 1.0);
+	view_position = (view * vec4(world_position, 1.0)).xyz;
+	gl_Position = (projection * vec4(view_position, 1.0));
 	world_normal = edgeDir[edgeID] * sign(getDensity(ivec3(orgin[0] + startCorner[edgeID])));
+	view_normal = (transpose(inverse(view * model)) * vec4(world_normal, 1.0)).xyz;
 	normal = (transpose(inverse(projection * view * model)) * vec4(world_normal, 1.0)).xyz;
 
 	EmitVertex();
